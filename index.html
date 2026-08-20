@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Painel de Treino - Hugo</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --accent: #ff5a36;
+    --accent2: #36d1ff;
+    --accent3: #7ee08c;
+    --text: #eef0f3;
+    --muted: #9aa0ac;
+    --border: #2a2e37;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+  }
+  h1 { font-size: 1.3rem; margin: 8px 0 2px; }
+  .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+  .card .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .card .value { font-size: 1.4rem; font-weight: 700; margin-top: 4px; }
+  .card .value span { font-size: 0.9rem; color: var(--muted); font-weight: 400; }
+  section { margin-bottom: 22px; }
+  section h2 { font-size: 1rem; margin: 0 0 10px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 8px; }
+  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
+  .pill-Run { background: rgba(255,90,54,0.18); color: var(--accent); }
+  .pill-Swim { background: rgba(54,209,255,0.18); color: var(--accent2); }
+  .pill-Workout { background: rgba(126,224,140,0.18); color: var(--accent3); }
+  footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 30px; }
+</style>
+</head>
+<body>
+  <h1>Painel de Treino Híbrido</h1>
+  <div class="sub">Hugo · atualizado em 19/08/2026 · dados do Strava</div>
+
+  <div class="cards" id="summaryCards"></div>
+
+  <section>
+    <h2>Volume semanal por modalidade (km)</h2>
+    <div class="chart-wrap"><canvas id="volumeChart" height="200"></canvas></div>
+  </section>
+
+  <section>
+    <h2>Evolução do ritmo de corrida (min/km)</h2>
+    <div class="chart-wrap"><canvas id="paceChart" height="180"></canvas></div>
+  </section>
+
+  <section>
+    <h2>Calorias por semana</h2>
+    <div class="chart-wrap"><canvas id="calChart" height="180"></canvas></div>
+  </section>
+
+  <section>
+    <h2>Zonas de referência</h2>
+    <div class="chart-wrap">
+      <table id="zonesTable"></table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Últimas atividades</h2>
+    <div class="chart-wrap">
+      <table>
+        <thead><tr><th>Data</th><th>Tipo</th><th>Dist.</th><th>Dur.</th><th>Ritmo</th><th>Cal.</th></tr></thead>
+        <tbody id="recentBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Painel gerado automaticamente a partir do Strava · dados até 19/08/2026</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+const DATA = {"generated_at": "19/08/2026", "week_labels": ["18/05", "25/05", "01/06", "08/06", "15/06", "22/06", "29/06", "06/07", "13/07", "20/07", "27/07", "03/08", "10/08", "17/08"], "weekly_volume": {"Run": [17.9, 3.0, 12.3, 12.6, 11.0, 4.0, 37.6, 24.6, 43.0, 45.9, 17.3, 10.8, 16.9, 8.0], "Swim": [0.0, 1.1, 1.0, 0.0, 3.0, 1.8, 2.0, 0.0, 0.5, 4.8, 7.8, 0.0, 0.0, 0.0], "Workout": [0.0, 1.6, 2.1, 1.8, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.5]}, "cal_series": [{"week": "18/05", "cal": 1433}, {"week": "25/05", "cal": 954}, {"week": "01/06", "cal": 1546}, {"week": "08/06", "cal": 1243}, {"week": "15/06", "cal": 2131}, {"week": "22/06", "cal": 1274}, {"week": "29/06", "cal": 4412}, {"week": "06/07", "cal": 2251}, {"week": "13/07", "cal": 3704}, {"week": "20/07", "cal": 5464}, {"week": "27/07", "cal": 3613}, {"week": "03/08", "cal": 878}, {"week": "10/08", "cal": 1263}, {"week": "17/08", "cal": 1331}], "run_pace_series": [{"date": "22/05", "pace": 5.75}, {"date": "24/05", "pace": 5.69}, {"date": "29/05", "pace": 4.77}, {"date": "05/06", "pace": 5.56}, {"date": "06/06", "pace": 5.22}, {"date": "10/06", "pace": 5.23}, {"date": "12/06", "pace": 5.1}, {"date": "14/06", "pace": 5.31}, {"date": "17/06", "pace": 5.4}, {"date": "20/06", "pace": 5.56}, {"date": "27/06", "pace": 8.76}, {"date": "29/06", "pace": 8.91}, {"date": "29/06", "pace": 5.3}, {"date": "30/06", "pace": 6.36}, {"date": "02/07", "pace": 5.7}, {"date": "05/07", "pace": 5.83}, {"date": "06/07", "pace": 6.3}, {"date": "09/07", "pace": 9.45}, {"date": "13/07", "pace": 5.88}, {"date": "15/07", "pace": 4.58}, {"date": "16/07", "pace": 6.76}, {"date": "17/07", "pace": 6.02}, {"date": "18/07", "pace": 5.48}, {"date": "19/07", "pace": 10.18}, {"date": "20/07", "pace": 5.93}, {"date": "21/07", "pace": 7.09}, {"date": "23/07", "pace": 6.42}, {"date": "25/07", "pace": 5.55}, {"date": "27/07", "pace": 7.68}, {"date": "29/07", "pace": 10.94}, {"date": "31/07", "pace": 8.25}, {"date": "05/08", "pace": 4.21}, {"date": "07/08", "pace": 5.66}, {"date": "10/08", "pace": 6.24}, {"date": "12/08", "pace": 4.97}, {"date": "14/08", "pace": 4.2}, {"date": "19/08", "pace": 5.05}], "summary_7": {"by_sport": {"Run": {"dist": 13.9, "dur": 95, "count": 3, "cal": 1083}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 1757, "total_sessions": 4}, "summary_30": {"by_sport": {"Run": {"dist": 90.7, "dur": 640, "count": 14, "cal": 7771}, "Swim": {"dist": 12.6, "dur": 281, "count": 5, "cal": 3409}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 11854, "total_sessions": 20}, "recent": [{"date": "19/08 16:12", "name": "Corrida da tarde", "sport": "Run", "dist": 8.02, "dur": 40.5, "cal": 657, "pace": "5:03/km"}, {"date": "17/08 17:54", "name": "Treino vespertino", "sport": "Workout", "dist": 5.54, "dur": 44.2, "cal": 674, "pace": ""}, {"date": "14/08 09:34", "name": "Corrida matinal", "sport": "Run", "dist": 2.95, "dur": 12.4, "cal": 230, "pace": "4:12/km"}, {"date": "13/08 11:40", "name": "Lunch Run", "sport": "Run", "dist": 2.93, "dur": 41.9, "cal": 196, "pace": "14:18/km"}, {"date": "12/08 09:17", "name": "Morning Run", "sport": "Run", "dist": 3.66, "dur": 18.2, "cal": 222, "pace": "4:58/km"}, {"date": "10/08 09:19", "name": "Morning Run", "sport": "Run", "dist": 7.32, "dur": 45.7, "cal": 615, "pace": "6:15/km"}, {"date": "07/08 18:17", "name": "Corrida ao entardecer", "sport": "Run", "dist": 7.93, "dur": 44.9, "cal": 708, "pace": "5:40/km"}, {"date": "05/08 09:29", "name": "Morning Run", "sport": "Run", "dist": 2.92, "dur": 12.3, "cal": 170, "pace": "4:13/km"}, {"date": "31/07 11:50", "name": "Natação na hora do almoço", "sport": "Swim", "dist": 3.93, "dur": 63.3, "cal": 859, "pace": ""}, {"date": "31/07 10:31", "name": "Corrida matinal", "sport": "Run", "dist": 7.03, "dur": 58.0, "cal": 558, "pace": "8:15/km"}, {"date": "29/07 11:16", "name": "Lunch Run", "sport": "Run", "dist": 3.84, "dur": 42.0, "cal": 367, "pace": "10:56/km"}, {"date": "29/07 09:09", "name": "Morning Swim", "sport": "Swim", "dist": 2.45, "dur": 90.8, "cal": 837, "pace": ""}, {"date": "27/07 10:42", "name": "Morning Run", "sport": "Run", "dist": 6.46, "dur": 49.6, "cal": 552, "pace": "7:41/km"}, {"date": "27/07 09:33", "name": "Morning Swim", "sport": "Swim", "dist": 1.45, "dur": 34.2, "cal": 440, "pace": ""}, {"date": "25/07 12:45", "name": "Lunch Run", "sport": "Run", "dist": 10.0, "dur": 55.5, "cal": 828, "pace": "5:33/km"}], "zones": {"hr": [{"z": "Z1", "min": 0, "max": 127}, {"z": "Z2", "min": 128, "max": 158}, {"z": "Z3", "min": 159, "max": 174}, {"z": "Z4", "min": 175, "max": 189}, {"z": "Z5", "min": 190, "max": null}], "run_pace": [{"z": "Z1", "min": null, "max": 2.569}, {"z": "Z2", "min": 2.569, "max": 2.985}, {"z": "Z3", "min": 2.985, "max": 3.325}, {"z": "Z4", "min": 3.325, "max": 3.551}, {"z": "Z5", "min": 3.551, "max": null}], "ftp": 133}};
+
+function fmtMin(min) {
+  const h = Math.floor(min/60), m = Math.round(min%60);
+  return h > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${m}min`;
+}
+
+// summary cards (7 dias)
+const s7 = DATA.summary_7;
+const cardsEl = document.getElementById('summaryCards');
+const run7 = s7.by_sport.Run || {dist:0,dur:0,count:0,cal:0};
+const swim7 = s7.by_sport.Swim || {dist:0,dur:0,count:0,cal:0};
+const wk7 = s7.by_sport.Workout || {dist:0,dur:0,count:0,cal:0};
+cardsEl.innerHTML = `
+  <div class="card"><div class="label">Corrida (7d)</div><div class="value">${run7.dist} <span>km</span></div></div>
+  <div class="card"><div class="label">Natação (7d)</div><div class="value">${swim7.dist} <span>km</span></div></div>
+  <div class="card"><div class="label">Sessões (7d)</div><div class="value">${s7.total_sessions}</div></div>
+  <div class="card"><div class="label">Calorias (7d)</div><div class="value">${s7.total_cal.toLocaleString('pt-BR')}</div></div>
+`;
+
+// weekly volume stacked bar
+new Chart(document.getElementById('volumeChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.week_labels,
+    datasets: [
+      {label: 'Corrida', data: DATA.weekly_volume.Run, backgroundColor: '#ff5a36'},
+      {label: 'Natação', data: DATA.weekly_volume.Swim, backgroundColor: '#36d1ff'},
+      {label: 'Workout', data: DATA.weekly_volume.Workout, backgroundColor: '#7ee08c'}
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: { x: { stacked: true, ticks:{color:'#9aa0ac'}, grid:{color:'#2a2e37'} }, y: { stacked: true, ticks:{color:'#9aa0ac'}, grid:{color:'#2a2e37'} } },
+    plugins: { legend: { labels: { color: '#eef0f3' } } }
+  }
+});
+
+// pace evolution
+const paceLabels = DATA.run_pace_series.map(p => p.date);
+const paceValues = DATA.run_pace_series.map(p => p.pace);
+new Chart(document.getElementById('paceChart'), {
+  type: 'line',
+  data: {
+    labels: paceLabels,
+    datasets: [{ label: 'Ritmo (min/km)', data: paceValues, borderColor: '#ff5a36', backgroundColor: 'rgba(255,90,54,0.15)', tension: 0.3, pointRadius: 2 }]
+  },
+  options: {
+    responsive: true,
+    scales: { y: { reverse: true, ticks:{color:'#9aa0ac'}, grid:{color:'#2a2e37'} }, x: { ticks:{color:'#9aa0ac', maxTicksLimit: 10}, grid:{display:false} } },
+    plugins: { legend: { labels: { color: '#eef0f3' } } }
+  }
+});
+
+// calories per week
+new Chart(document.getElementById('calChart'), {
+  type: 'line',
+  data: {
+    labels: DATA.cal_series.map(c => c.week),
+    datasets: [{ label: 'Calorias', data: DATA.cal_series.map(c => c.cal), borderColor: '#7ee08c', backgroundColor: 'rgba(126,224,140,0.15)', tension: 0.3, fill: true, pointRadius: 2 }]
+  },
+  options: {
+    responsive: true,
+    scales: { y: { ticks:{color:'#9aa0ac'}, grid:{color:'#2a2e37'} }, x: { ticks:{color:'#9aa0ac', maxTicksLimit: 10}, grid:{display:false} } },
+    plugins: { legend: { labels: { color: '#eef0f3' } } }
+  }
+});
+
+// zones table
+const z = DATA.zones;
+let zHtml = '<thead><tr><th>Zona</th><th>FC (bpm)</th><th>Ritmo corrida (min/km)</th></tr></thead><tbody>';
+for (let i = 0; i < z.hr.length; i++) {
+  const hr = z.hr[i];
+  const rp = z.run_pace[i];
+  const hrStr = hr.max ? `${hr.min}-${hr.max}` : `${hr.min}+`;
+  const rpStr = rp.min && rp.max ? `${rp.min.toFixed(2)}-${rp.max.toFixed(2)}` : (rp.max ? `< ${rp.max.toFixed(2)}` : `> ${rp.min.toFixed(2)}`);
+  zHtml += `<tr><td>${hr.z}</td><td>${hrStr}</td><td>${rpStr}</td></tr>`;
+}
+zHtml += `</tbody>`;
+document.getElementById('zonesTable').innerHTML = zHtml;
+
+// recent activities
+const tbody = document.getElementById('recentBody');
+tbody.innerHTML = DATA.recent.map(r => `
+  <tr>
+    <td>${r.date}</td>
+    <td><span class="pill pill-${r.sport}">${r.sport}</span></td>
+    <td>${r.dist} km</td>
+    <td>${fmtMin(r.dur)}</td>
+    <td>${r.pace || '-'}</td>
+    <td>${r.cal}</td>
+  </tr>
+`).join('');
+</script>
+</body>
+</html>
