@@ -3,7 +3,7 @@
   "short_name": "Treinos",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#faf6f0",
-  "theme_color": "#ff6b4a",
+  "background_color": "#12140d",
+  "theme_color": "#7a9b3f",
   "icons": []
 }

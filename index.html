@@ -6,78 +6,83 @@
 <title>Painel de Treino - Hugo</title>
 <link rel="manifest" href="manifest.json">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap');
   :root {
-    --bg: #faf6f0;
-    --card: #ffffff;
-    --ink: #2b2620;
-    --muted: #8a8175;
-    --border: #ece5d8;
-    --coral: #ff6b4a;
-    --teal: #14b8a6;
-    --violet: #8b5cf6;
-    --sun: #ffb648;
+    --bg: #12140d;
+    --card: #1b1f15;
+    --ink: #e9e4d3;
+    --muted: #8f9581;
+    --border: #333a27;
+    --accent: #7a9b3f;
+    --steel: #5c88ad;
+    --khaki: #b39b5e;
+    --amber: #d98a3d;
+    --danger: #e2574c;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
     padding: 18px;
     max-width: 720px;
     margin: 0 auto;
     padding-bottom: 60px;
   }
-  h1 { font-size: 1.5rem; margin: 6px 0 2px; letter-spacing: -0.01em; }
-  .sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 18px; }
+  h1 { font-family: 'Black Ops One', sans-serif; font-size: 1.35rem; margin: 6px 0 2px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--khaki); }
+  .sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .quote-banner { background: linear-gradient(135deg, #1b1f15, #232a19); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; }
+  .quote-banner .qtext { font-size: 0.9rem; color: var(--ink); font-style: italic; line-height: 1.45; }
+  .quote-banner .qauthor { margin-top: 8px; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
   .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(43,38,32,0.04); }
-  .card .label { font-size: 0.74rem; color: var(--muted); }
-  .card .value { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
+  .card .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+  .card .value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; color: var(--ink); }
   .card .value span { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
   section { margin-bottom: 24px; }
-  section h2 { font-size: 1.05rem; margin: 0 0 10px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
-  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; box-shadow: 0 2px 10px rgba(43,38,32,0.04); }
+  section h2 { font-family: 'Black Ops One', sans-serif; font-size: 0.95rem; margin: 0 0 10px; color: var(--khaki); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.02em; }
+  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
   table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
   th, td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; }
-  .pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; }
-  .pill-Run { background: rgba(255,107,74,0.14); color: var(--coral); }
-  .pill-Swim { background: rgba(20,184,166,0.14); color: var(--teal); }
-  .pill-Workout { background: rgba(139,92,246,0.14); color: var(--violet); }
-  footer { text-align: center; color: var(--muted); font-size: 0.74rem; margin-top: 34px; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+  .pill-Run { background: rgba(122,155,63,0.18); color: var(--accent); }
+  .pill-Swim { background: rgba(92,136,173,0.18); color: var(--steel); }
+  .pill-Workout { background: rgba(179,155,94,0.18); color: var(--khaki); }
+  footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 34px; text-transform: uppercase; letter-spacing: 0.03em; }
 
   .plan-progress { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
   .plan-progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 5px; }
-  .plan-progress-fill { height: 100%; background: var(--coral); transition: width 0.2s; }
-  .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(43,38,32,0.04); }
-  .plan-banner { padding: 10px 14px; font-weight: 700; font-size: 0.9rem; color: #fff; }
+  .plan-progress-fill { height: 100%; background: var(--accent); transition: width 0.2s; }
+  .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
+  .plan-banner { padding: 10px 14px; font-family: 'Black Ops One', sans-serif; font-size: 0.85rem; color: #f5f2e6; text-transform: uppercase; letter-spacing: 0.02em; }
   .plan-row { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.85rem; }
-  .plan-row.warm { color: var(--muted); font-size: 0.76rem; font-style: italic; background: #fdf6ee; }
+  .plan-row.warm { color: var(--muted); font-size: 0.76rem; font-style: italic; background: rgba(255,255,255,0.02); }
   .plan-row.sess label.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .plan-row.sess input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--coral); flex-shrink: 0; }
+  .plan-row.sess input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
   .plan-desc { margin-top: 4px; margin-left: 26px; color: var(--ink); }
   .plan-row.sess.done strong, .plan-row.sess.done .plan-desc { text-decoration: line-through; color: var(--muted); }
-  .plan-meta { padding: 10px 14px; background: #fff8e1; border-top: 1px solid var(--border); font-size: 0.82rem; font-weight: 600; }
+  .plan-meta { padding: 10px 14px; background: rgba(217,138,61,0.1); border-top: 1px solid var(--border); font-size: 0.82rem; font-weight: 600; color: var(--amber); }
   .plan-registro { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); }
-  .plan-registro select, .plan-registro input[type=text] { border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; font-family: inherit; color: var(--ink); }
+  .plan-registro select, .plan-registro input[type=text] { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.78rem; font-family: inherit; color: var(--ink); }
   .plan-registro input[type=text] { flex: 1; min-width: 90px; }
 
   #gate {
     position: fixed; inset: 0; z-index: 999;
-    background: linear-gradient(160deg, #2b2620 0%, #40332a 100%);
+    background: linear-gradient(160deg, #0d0f0a 0%, #1f2617 100%);
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
   }
-  #gate .box { background: var(--card); border-radius: 20px; padding: 32px 26px; max-width: 320px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+  #gate .box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 32px 26px; max-width: 320px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
   #gate .lock { font-size: 2.4rem; margin-bottom: 6px; }
-  #gate h2 { margin: 0 0 4px; font-size: 1.15rem; }
-  #gate p { color: var(--muted); font-size: 0.85rem; margin: 0 0 18px; }
-  #gate input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 1rem; text-align: center; letter-spacing: 0.15em; outline: none; }
-  #gate input:focus { border-color: var(--coral); }
-  #gate button { width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 12px; border: none; background: var(--coral); color: white; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+  #gate h2 { font-family: 'Black Ops One', sans-serif; margin: 0 0 4px; font-size: 1.05rem; color: var(--khaki); text-transform: uppercase; letter-spacing: 0.02em; }
+  #gate p { color: var(--muted); font-size: 0.85rem; margin: 0 0 18px; text-transform: uppercase; letter-spacing: 0.03em; }
+  #gate input { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); color: var(--ink); font-family: 'Share Tech Mono', monospace; font-size: 1rem; text-align: center; letter-spacing: 0.15em; outline: none; }
+  #gate input:focus { border-color: var(--accent); }
+  #gate button { width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 8px; border: none; background: var(--accent); color: #12140d; font-family: 'Black Ops One', sans-serif; font-size: 0.9rem; letter-spacing: 0.03em; text-transform: uppercase; cursor: pointer; }
   #gate button:active { transform: scale(0.98); }
-  #gate .err { color: var(--coral); font-size: 0.8rem; margin-top: 10px; min-height: 1em; }
+  #gate .err { color: var(--danger); font-size: 0.8rem; margin-top: 10px; min-height: 1em; }
   #gate.shake .box { animation: shake 0.35s; }
   @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
   #app { display: none; }
@@ -87,51 +92,52 @@
 
 <div id="gate">
   <div class="box">
-    <div class="lock">🔒</div>
-    <h2>Ei, é você mesmo?</h2>
+    <div class="lock">🪖</div>
+    <h2>Identifique-se, soldado</h2>
     <p>Digite o seu NIP</p>
     <input type="password" id="pwInput" inputmode="numeric" autocomplete="off" placeholder="••••••••" maxlength="20">
-    <button id="pwBtn">Entrar</button>
+    <button id="pwBtn">Autorizar acesso</button>
     <div class="err" id="pwErr"></div>
   </div>
 </div>
 
 <div id="app">
-  <h1>Painel de Treino Híbrido 🏃‍♂️🏊‍♂️</h1>
+  <h1>🎖️ Operação Híbrida</h1>
   <div class="sub">Hugo · atualizado em 19/08/2026 · direto do Strava</div>
+  <div class="quote-banner" id="quoteBanner"></div>
 
   <div class="cards" id="summaryCards"></div>
 
   <section>
-    <h2>📋 Plano de treino (bloco 21/08–04/09)</h2>
+    <h2>🎖️ Ordem de Missão (bloco 21/08–04/09)</h2>
     <div id="planProgress" class="plan-progress"></div>
     <div id="planCards"></div>
   </section>
 
   <section>
-    <h2>📊 Volume semanal por modalidade (km)</h2>
+    <h2>📊 Relatório de Volume Semanal (km)</h2>
     <div class="chart-wrap"><canvas id="volumeChart" height="200"></canvas></div>
   </section>
 
   <section>
-    <h2>⚡ Evolução do ritmo de corrida (min/km)</h2>
+    <h2>⚡ Evolução do Ritmo de Combate (min/km)</h2>
     <div class="chart-wrap"><canvas id="paceChart" height="180"></canvas></div>
   </section>
 
   <section>
-    <h2>🔥 Calorias por semana</h2>
+    <h2>🔥 Consumo Energético Semanal</h2>
     <div class="chart-wrap"><canvas id="calChart" height="180"></canvas></div>
   </section>
 
   <section>
-    <h2>🎯 Zonas de referência</h2>
+    <h2>🎯 Zonas de Combate (referência)</h2>
     <div class="chart-wrap">
       <table id="zonesTable"></table>
     </div>
   </section>
 
   <section>
-    <h2>🗓️ Últimas atividades</h2>
+    <h2>🗓️ Relatório de Campo — Últimas Atividades</h2>
     <div class="chart-wrap">
       <table>
         <thead><tr><th>Data</th><th>Tipo</th><th>Dist.</th><th>Dur.</th><th>Ritmo</th><th>Cal.</th></tr></thead>
@@ -140,7 +146,7 @@
     </div>
   </section>
 
-  <footer>Painel gerado automaticamente a partir do Strava · dados até 19/08/2026</footer>
+  <footer>Transmissão automática via Strava · dados até 19/08/2026</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
@@ -168,14 +174,58 @@ async function tryUnlock() {
     unlockApp();
   } else {
     const gate = document.getElementById('gate');
-    document.getElementById('pwErr').textContent = 'Senha incorreta, tenta de novo';
+    document.getElementById('pwErr').textContent = 'NIP incorreto. Tente novamente, soldado.';
     gate.classList.remove('shake'); void gate.offsetWidth; gate.classList.add('shake');
   }
 }
 document.getElementById('pwBtn').addEventListener('click', tryUnlock);
 document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
 
-const DATA = {"generated_at": "19/08/2026", "week_labels": ["18/05", "25/05", "01/06", "08/06", "15/06", "22/06", "29/06", "06/07", "13/07", "20/07", "27/07", "03/08", "10/08", "17/08"], "weekly_volume": {"Run": [17.9, 3.0, 12.3, 12.6, 11.0, 4.0, 37.6, 24.6, 43.0, 45.9, 17.3, 10.8, 16.9, 8.0], "Swim": [0.0, 1.1, 1.0, 0.0, 3.0, 1.8, 2.0, 0.0, 0.5, 4.8, 7.8, 0.0, 0.0, 0.0], "Workout": [0.0, 1.6, 2.1, 1.8, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.5]}, "cal_series": [{"week": "18/05", "cal": 1433}, {"week": "25/05", "cal": 954}, {"week": "01/06", "cal": 1546}, {"week": "08/06", "cal": 1243}, {"week": "15/06", "cal": 2131}, {"week": "22/06", "cal": 1274}, {"week": "29/06", "cal": 4412}, {"week": "06/07", "cal": 2251}, {"week": "13/07", "cal": 3704}, {"week": "20/07", "cal": 5464}, {"week": "27/07", "cal": 3613}, {"week": "03/08", "cal": 878}, {"week": "10/08", "cal": 1263}, {"week": "17/08", "cal": 1331}], "run_pace_series": [{"date": "22/05", "pace": 5.75}, {"date": "24/05", "pace": 5.69}, {"date": "29/05", "pace": 4.77}, {"date": "05/06", "pace": 5.56}, {"date": "06/06", "pace": 5.22}, {"date": "10/06", "pace": 5.23}, {"date": "12/06", "pace": 5.1}, {"date": "14/06", "pace": 5.31}, {"date": "17/06", "pace": 5.4}, {"date": "20/06", "pace": 5.56}, {"date": "27/06", "pace": 8.76}, {"date": "29/06", "pace": 8.91}, {"date": "29/06", "pace": 5.3}, {"date": "30/06", "pace": 6.36}, {"date": "02/07", "pace": 5.7}, {"date": "05/07", "pace": 5.83}, {"date": "06/07", "pace": 6.3}, {"date": "09/07", "pace": 9.45}, {"date": "13/07", "pace": 5.88}, {"date": "15/07", "pace": 4.58}, {"date": "16/07", "pace": 6.76}, {"date": "17/07", "pace": 6.02}, {"date": "18/07", "pace": 5.48}, {"date": "19/07", "pace": 10.18}, {"date": "20/07", "pace": 5.93}, {"date": "21/07", "pace": 7.09}, {"date": "23/07", "pace": 6.42}, {"date": "25/07", "pace": 5.55}, {"date": "27/07", "pace": 7.68}, {"date": "29/07", "pace": 10.94}, {"date": "31/07", "pace": 8.25}, {"date": "05/08", "pace": 4.21}, {"date": "07/08", "pace": 5.66}, {"date": "10/08", "pace": 6.24}, {"date": "12/08", "pace": 4.97}, {"date": "14/08", "pace": 4.2}, {"date": "19/08", "pace": 5.05}], "summary_7": {"by_sport": {"Run": {"dist": 13.9, "dur": 95, "count": 3, "cal": 1083}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 1757, "total_sessions": 4}, "summary_30": {"by_sport": {"Run": {"dist": 90.7, "dur": 640, "count": 14, "cal": 7771}, "Swim": {"dist": 12.6, "dur": 281, "count": 5, "cal": 3409}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 11854, "total_sessions": 20}, "recent": [{"date": "19/08 16:12", "name": "Corrida da tarde", "sport": "Run", "dist": 8.02, "dur": 40.5, "cal": 657, "pace": "5:03/km"}, {"date": "17/08 17:54", "name": "Treino vespertino", "sport": "Workout", "dist": 5.54, "dur": 44.2, "cal": 674, "pace": ""}, {"date": "14/08 09:34", "name": "Corrida matinal", "sport": "Run", "dist": 2.95, "dur": 12.4, "cal": 230, "pace": "4:12/km"}, {"date": "13/08 11:40", "name": "Lunch Run", "sport": "Run", "dist": 2.93, "dur": 41.9, "cal": 196, "pace": "14:18/km"}, {"date": "12/08 09:17", "name": "Morning Run", "sport": "Run", "dist": 3.66, "dur": 18.2, "cal": 222, "pace": "4:58/km"}, {"date": "10/08 09:19", "name": "Morning Run", "sport": "Run", "dist": 7.32, "dur": 45.7, "cal": 615, "pace": "6:15/km"}, {"date": "07/08 18:17", "name": "Corrida ao entardecer", "sport": "Run", "dist": 7.93, "dur": 44.9, "cal": 708, "pace": "5:40/km"}, {"date": "05/08 09:29", "name": "Morning Run", "sport": "Run", "dist": 2.92, "dur": 12.3, "cal": 170, "pace": "4:13/km"}, {"date": "31/07 11:50", "name": "Natação na hora do almoço", "sport": "Swim", "dist": 3.93, "dur": 63.3, "cal": 859, "pace": ""}, {"date": "31/07 10:31", "name": "Corrida matinal", "sport": "Run", "dist": 7.03, "dur": 58.0, "cal": 558, "pace": "8:15/km"}, {"date": "29/07 11:16", "name": "Lunch Run", "sport": "Run", "dist": 3.84, "dur": 42.0, "cal": 367, "pace": "10:56/km"}, {"date": "29/07 09:09", "name": "Morning Swim", "sport": "Swim", "dist": 2.45, "dur": 90.8, "cal": 837, "pace": ""}, {"date": "27/07 10:42", "name": "Morning Run", "sport": "Run", "dist": 6.46, "dur": 49.6, "cal": 552, "pace": "7:41/km"}, {"date": "27/07 09:33", "name": "Morning Swim", "sport": "Swim", "dist": 1.45, "dur": 34.2, "cal": 440, "pace": ""}, {"date": "25/07 12:45", "name": "Lunch Run", "sport": "Run", "dist": 10.0, "dur": 55.5, "cal": 828, "pace": "5:33/km"}], "zones": {"hr": [{"z": "Z1", "min": 0, "max": 127}, {"z": "Z2", "min": 128, "max": 158}, {"z": "Z3", "min": 159, "max": 174}, {"z": "Z4", "min": 175, "max": 189}, {"z": "Z5", "min": 190, "max": null}], "run_pace": [{"z": "Z1", "min": null, "max": 2.569}, {"z": "Z2", "min": 2.569, "max": 2.985}, {"z": "Z3", "min": 2.985, "max": 3.325}, {"z": "Z4", "min": 3.325, "max": 3.551}, {"z": "Z5", "min": 3.551, "max": null}], "ftp": 133}, "plan": [{"date_iso": "2026-08-21", "date": "21/08", "weekday": "Sex", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Dia de Força", "warm_am": "8-10min, mobilidade de quadril/tornozelo, aproximações", "sess_am_title": "Força MI #1", "sess_am": "Agachamento livre, 5x5 pesado (~perto de 105kg), 2-3min descanso; RDL leve 3x8", "warm_pm": "leve, soltar as pernas", "sess_pm_title": "Corrida leve", "sess_pm": "25min zona 1", "meta": "Fechar 5x5 sem perder técnica, PSE até 8"}, {"date_iso": "2026-08-22", "date": "22/08", "weekday": "Sáb", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação", "warm_am": "5min nado leve", "sess_am_title": "Natação técnica", "sess_am": "30-40min: 200m livre + 4x50m pernada c/ prancha + 4x50m nadadeira + 4x50m palmar (desc 20-30s) + fecha 200m livre", "warm_pm": "mobilidade de ombro/punho", "sess_pm_title": "Calistenia leve", "sess_pm": "2-3 séries flexão/barra/abdominal a 60-70%, foco em técnica", "meta": "Qualidade de movimento, sem meta de reps"}, {"date_iso": "2026-08-23", "date": "23/08", "weekday": "Dom", "type": "corrida", "color": "#2e8b57", "icon": "🏃", "label": "Dia de Corrida", "warm_am": "10min + educativos + tiros progressivos 60-80m", "sess_am_title": "Corrida intervalada #1", "sess_am": "8x400m forte, 75s trote entre tiros", "warm_pm": "leve", "sess_pm_title": "Calistenia leve", "sess_pm": "Flexão/barra/abdominal + prancha 3x40-60s", "meta": "Cada 400m ≤1:38 (pace ~4:08/km)"}, {"date_iso": "2026-08-24", "date": "24/08", "weekday": "Seg (sem natação)", "type": "calistenia", "color": "#8b5cf6", "icon": "🤸", "label": "Calistenia", "warm_am": "5-6min", "sess_am_title": "Corrida leve", "sess_am": "20min + 4 strides de 20m", "warm_pm": "-", "sess_pm_title": "Progressão Flexões", "sess_pm": "4 séries quase à falha, desc 60-90s, descida 2s/subida 1s", "meta": "Somar 42 flexões (baseline 40)"}, {"date_iso": "2026-08-25", "date": "25/08", "weekday": "Ter", "type": "explosivo", "color": "#d64545", "icon": "⚡", "label": "Dia Explosivo", "warm_am": "8-10min + mobilidade dinâmica + ativação", "sess_am_title": "Explosivo #1", "sess_am": "Saltos/sprints: 5x5 saltos explosivos + 6 sprints 20m + 2 sprints 30m máximos", "warm_pm": "leve", "sess_pm_title": "Natação leve técnica", "sess_pm": "25min: 150m + 4x50m nadadeira + 200m", "meta": "Sprints máximos sem perder forma"}, {"date_iso": "2026-08-26", "date": "26/08", "weekday": "Qua", "type": "academia", "color": "#a9772f", "icon": "💪", "label": "Dia de Academia", "warm_am": "5min", "sess_am_title": "Natação técnica", "sess_am": "30min: 150m + 4x50m pernada + 4x50m palmar + 4x50m nadadeira + 100m", "warm_pm": "leve", "sess_pm_title": "Academia leve + calistenia", "sess_pm": "Leg press 3x12 leve, remada baixa polia 3x12, calistenia leve + alongamento", "meta": "Sem carga pesada, variar estímulo"}, {"date_iso": "2026-08-27", "date": "27/08", "weekday": "Qui", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Dia de Força", "warm_am": "8-10min", "sess_am_title": "Força MI #2", "sess_am": "Levantamento terra, 5x5 pesado (~130kg); agachamento leve 3x8", "warm_pm": "leve", "sess_pm_title": "Corrida leve", "sess_pm": "20-25min zona 1", "meta": "Terra sem perder lombar neutra"}, {"date_iso": "2026-08-28", "date": "28/08", "weekday": "Sex", "type": "calistenia", "color": "#8b5cf6", "icon": "🤸", "label": "Calistenia", "warm_am": "5min", "sess_am_title": "Corrida leve", "sess_am": "20-25min zona 1 (recuperação ativa)", "warm_pm": "-", "sess_pm_title": "Progressão Barra", "sess_pm": "4-5 séries pronada estrita, desc 2min", "meta": "12 barras total (baseline 11)"}, {"date_iso": "2026-08-29", "date": "29/08", "weekday": "Sáb", "type": "corrida", "color": "#2e8b57", "icon": "🏃", "label": "Dia de Corrida", "warm_am": "10min + tiros progressivos 80-100m", "sess_am_title": "Corrida intervalada #2", "sess_am": "4x1200m ritmo limiar, 2min trote", "warm_pm": "leve", "sess_pm_title": "Calistenia + academia (core)", "sess_pm": "Abdominal 3-4 séries + prancha rotação 3x30-40s cada lado", "meta": "1200m ≤4:10/km, 65 abdominais total (baseline 60)"}, {"date_iso": "2026-08-30", "date": "30/08", "weekday": "Dom", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação", "warm_am": "3-5min", "sess_am_title": "Natação leve", "sess_am": "25min: 200m + 4x50m nadadeira + 100m", "warm_pm": "não precisa", "sess_pm_title": "Descanso ativo", "sess_pm": "Caminhada + alongamento", "meta": "Recuperar de verdade, sem número"}, {"date_iso": "2026-08-31", "date": "31/08", "weekday": "Seg (sem natação)", "type": "explosivo", "color": "#d64545", "icon": "⚡", "label": "Dia Explosivo", "warm_am": "8-10min", "sess_am_title": "Explosivo #2", "sess_am": "5x6 saltos + 6 sprints 20m + 2 sprints 40m", "warm_pm": "leve", "sess_pm_title": "Calistenia leve", "sess_pm": "Agachamento, 4 séries peso corpo quase à falha", "meta": "100 agachamentos total (baseline 95)"}, {"date_iso": "2026-09-01", "date": "01/09", "weekday": "Ter", "type": "academia", "color": "#a9772f", "icon": "💪", "label": "Dia de Academia", "warm_am": "5min", "sess_am_title": "Natação técnica", "sess_am": "30min: 150m + 4x50m palmar + 4x50m pernada + 4x50m nadadeira progressivo + 100m", "warm_pm": "mobilidade de ombro", "sess_pm_title": "Academia leve", "sess_pm": "Supino (primeira vez testando, 3-4 séries carga confortável) + flexões 3 séries quase à falha", "meta": "Anotar carga do supino, 45 flexões (checkpoint)"}, {"date_iso": "2026-09-02", "date": "02/09", "weekday": "Qua", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Força (pico do bloco)", "warm_am": "8-10min", "sess_am_title": "Força MI #3", "sess_am": "Agachamento 4x4 (~85-88%) + Terra 3x3 (~85%)", "warm_pm": "2-3min", "sess_pm_title": "Corrida bem leve", "sess_pm": "15min zona 1", "meta": "Sentir força com boa técnica, sem recorde"}, {"date_iso": "2026-09-03", "date": "03/09", "weekday": "Qui", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação", "warm_am": "3-5min", "sess_am_title": "Corrida bem leve", "sess_am": "15min + 3 strides 15m", "warm_pm": "não precisa", "sess_pm_title": "Descanso/mobilidade leve", "sess_pm": "-", "meta": "Chegar descansado amanhã"}, {"date_iso": "2026-09-04", "date": "04/09", "weekday": "Sex", "type": "fechamento", "color": "#3d6fb4", "icon": "🏁", "label": "Fechamento do Bloco", "warm_am": "5-8min", "sess_am_title": "Corrida moderada", "sess_am": "20min forte-controlado (não é teste)", "warm_pm": "leve", "sess_pm_title": "Academia leve + calistenia", "sess_pm": "Leg press/remada/supino à escolha", "meta": "Fechar bem, sem cobrar resultado; volta a 1x/dia no dia seguinte"}]};
+const DATA = {"generated_at": "19/08/2026", "week_labels": ["18/05", "25/05", "01/06", "08/06", "15/06", "22/06", "29/06", "06/07", "13/07", "20/07", "27/07", "03/08", "10/08", "17/08"], "weekly_volume": {"Run": [17.9, 3.0, 12.3, 12.6, 11.0, 4.0, 37.6, 24.6, 43.0, 45.9, 17.3, 10.8, 16.9, 8.0], "Swim": [0.0, 1.1, 1.0, 0.0, 3.0, 1.8, 2.0, 0.0, 0.5, 4.8, 7.8, 0.0, 0.0, 0.0], "Workout": [0.0, 1.6, 2.1, 1.8, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.5]}, "cal_series": [{"week": "18/05", "cal": 1433}, {"week": "25/05", "cal": 954}, {"week": "01/06", "cal": 1546}, {"week": "08/06", "cal": 1243}, {"week": "15/06", "cal": 2131}, {"week": "22/06", "cal": 1274}, {"week": "29/06", "cal": 4412}, {"week": "06/07", "cal": 2251}, {"week": "13/07", "cal": 3704}, {"week": "20/07", "cal": 5464}, {"week": "27/07", "cal": 3613}, {"week": "03/08", "cal": 878}, {"week": "10/08", "cal": 1263}, {"week": "17/08", "cal": 1331}], "run_pace_series": [{"date": "22/05", "pace": 5.75}, {"date": "24/05", "pace": 5.69}, {"date": "29/05", "pace": 4.77}, {"date": "05/06", "pace": 5.56}, {"date": "06/06", "pace": 5.22}, {"date": "10/06", "pace": 5.23}, {"date": "12/06", "pace": 5.1}, {"date": "14/06", "pace": 5.31}, {"date": "17/06", "pace": 5.4}, {"date": "20/06", "pace": 5.56}, {"date": "27/06", "pace": 8.76}, {"date": "29/06", "pace": 8.91}, {"date": "29/06", "pace": 5.3}, {"date": "30/06", "pace": 6.36}, {"date": "02/07", "pace": 5.7}, {"date": "05/07", "pace": 5.83}, {"date": "06/07", "pace": 6.3}, {"date": "09/07", "pace": 9.45}, {"date": "13/07", "pace": 5.88}, {"date": "15/07", "pace": 4.58}, {"date": "16/07", "pace": 6.76}, {"date": "17/07", "pace": 6.02}, {"date": "18/07", "pace": 5.48}, {"date": "19/07", "pace": 10.18}, {"date": "20/07", "pace": 5.93}, {"date": "21/07", "pace": 7.09}, {"date": "23/07", "pace": 6.42}, {"date": "25/07", "pace": 5.55}, {"date": "27/07", "pace": 7.68}, {"date": "29/07", "pace": 10.94}, {"date": "31/07", "pace": 8.25}, {"date": "05/08", "pace": 4.21}, {"date": "07/08", "pace": 5.66}, {"date": "10/08", "pace": 6.24}, {"date": "12/08", "pace": 4.97}, {"date": "14/08", "pace": 4.2}, {"date": "19/08", "pace": 5.05}], "summary_7": {"by_sport": {"Run": {"dist": 13.9, "dur": 95, "count": 3, "cal": 1083}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 1757, "total_sessions": 4}, "summary_30": {"by_sport": {"Run": {"dist": 90.7, "dur": 640, "count": 14, "cal": 7771}, "Swim": {"dist": 12.6, "dur": 281, "count": 5, "cal": 3409}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 11854, "total_sessions": 20}, "recent": [{"date": "19/08 16:12", "name": "Corrida da tarde", "sport": "Run", "dist": 8.02, "dur": 40.5, "cal": 657, "pace": "5:03/km"}, {"date": "17/08 17:54", "name": "Treino vespertino", "sport": "Workout", "dist": 5.54, "dur": 44.2, "cal": 674, "pace": ""}, {"date": "14/08 09:34", "name": "Corrida matinal", "sport": "Run", "dist": 2.95, "dur": 12.4, "cal": 230, "pace": "4:12/km"}, {"date": "13/08 11:40", "name": "Lunch Run", "sport": "Run", "dist": 2.93, "dur": 41.9, "cal": 196, "pace": "14:18/km"}, {"date": "12/08 09:17", "name": "Morning Run", "sport": "Run", "dist": 3.66, "dur": 18.2, "cal": 222, "pace": "4:58/km"}, {"date": "10/08 09:19", "name": "Morning Run", "sport": "Run", "dist": 7.32, "dur": 45.7, "cal": 615, "pace": "6:15/km"}, {"date": "07/08 18:17", "name": "Corrida ao entardecer", "sport": "Run", "dist": 7.93, "dur": 44.9, "cal": 708, "pace": "5:40/km"}, {"date": "05/08 09:29", "name": "Morning Run", "sport": "Run", "dist": 2.92, "dur": 12.3, "cal": 170, "pace": "4:13/km"}, {"date": "31/07 11:50", "name": "Natação na hora do almoço", "sport": "Swim", "dist": 3.93, "dur": 63.3, "cal": 859, "pace": ""}, {"date": "31/07 10:31", "name": "Corrida matinal", "sport": "Run", "dist": 7.03, "dur": 58.0, "cal": 558, "pace": "8:15/km"}, {"date": "29/07 11:16", "name": "Lunch Run", "sport": "Run", "dist": 3.84, "dur": 42.0, "cal": 367, "pace": "10:56/km"}, {"date": "29/07 09:09", "name": "Morning Swim", "sport": "Swim", "dist": 2.45, "dur": 90.8, "cal": 837, "pace": ""}, {"date": "27/07 10:42", "name": "Morning Run", "sport": "Run", "dist": 6.46, "dur": 49.6, "cal": 552, "pace": "7:41/km"}, {"date": "27/07 09:33", "name": "Morning Swim", "sport": "Swim", "dist": 1.45, "dur": 34.2, "cal": 440, "pace": ""}, {"date": "25/07 12:45", "name": "Lunch Run", "sport": "Run", "dist": 10.0, "dur": 55.5, "cal": 828, "pace": "5:33/km"}], "zones": {"hr": [{"z": "Z1", "min": 0, "max": 127}, {"z": "Z2", "min": 128, "max": 158}, {"z": "Z3", "min": 159, "max": 174}, {"z": "Z4", "min": 175, "max": 189}, {"z": "Z5", "min": 190, "max": null}], "run_pace": [{"z": "Z1", "min": null, "max": 2.569}, {"z": "Z2", "min": 2.569, "max": 2.985}, {"z": "Z3", "min": 2.985, "max": 3.325}, {"z": "Z4", "min": 3.325, "max": 3.551}, {"z": "Z5", "min": 3.551, "max": null}], "ftp": 133}, "plan": [{"date_iso": "2026-08-21", "date": "21/08", "weekday": "Sex", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Missão de Força", "warm_am": "8-10min, mobilidade de quadril/tornozelo, aproximações", "sess_am_title": "Força MI #1", "sess_am": "Agachamento livre, 5x5 pesado (~perto de 105kg), 2-3min descanso; RDL leve 3x8", "warm_pm": "leve, soltar as pernas", "sess_pm_title": "Corrida leve", "sess_pm": "25min zona 1", "meta": "Fechar 5x5 sem perder técnica, PSE até 8"}, {"date_iso": "2026-08-22", "date": "22/08", "weekday": "Sáb", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação Tática", "warm_am": "5min nado leve", "sess_am_title": "Natação técnica", "sess_am": "30-40min: 200m livre + 4x50m pernada c/ prancha + 4x50m nadadeira + 4x50m palmar (desc 20-30s) + fecha 200m livre", "warm_pm": "mobilidade de ombro/punho", "sess_pm_title": "Calistenia leve", "sess_pm": "2-3 séries flexão/barra/abdominal a 60-70%, foco em técnica", "meta": "Qualidade de movimento, sem meta de reps"}, {"date_iso": "2026-08-23", "date": "23/08", "weekday": "Dom", "type": "corrida", "color": "#2e8b57", "icon": "🏃", "label": "Missão de Corrida", "warm_am": "10min + educativos + tiros progressivos 60-80m", "sess_am_title": "Corrida intervalada #1", "sess_am": "8x400m forte, 75s trote entre tiros", "warm_pm": "leve", "sess_pm_title": "Calistenia leve", "sess_pm": "Flexão/barra/abdominal + prancha 3x40-60s", "meta": "Cada 400m ≤1:38 (pace ~4:08/km)"}, {"date_iso": "2026-08-24", "date": "24/08", "weekday": "Seg (sem natação)", "type": "calistenia", "color": "#8b5cf6", "icon": "🤸", "label": "Treinamento de Combate", "warm_am": "5-6min", "sess_am_title": "Corrida leve", "sess_am": "20min + 4 strides de 20m", "warm_pm": "-", "sess_pm_title": "Progressão Flexões", "sess_pm": "4 séries quase à falha, desc 60-90s, descida 2s/subida 1s", "meta": "Somar 42 flexões (baseline 40)"}, {"date_iso": "2026-08-25", "date": "25/08", "weekday": "Ter", "type": "explosivo", "color": "#d64545", "icon": "⚡", "label": "Missão de Potência", "warm_am": "8-10min + mobilidade dinâmica + ativação", "sess_am_title": "Explosivo #1", "sess_am": "Saltos/sprints: 5x5 saltos explosivos + 6 sprints 20m + 2 sprints 30m máximos", "warm_pm": "leve", "sess_pm_title": "Natação leve técnica", "sess_pm": "25min: 150m + 4x50m nadadeira + 200m", "meta": "Sprints máximos sem perder forma"}, {"date_iso": "2026-08-26", "date": "26/08", "weekday": "Qua", "type": "academia", "color": "#a9772f", "icon": "💪", "label": "Missão de Academia", "warm_am": "5min", "sess_am_title": "Natação técnica", "sess_am": "30min: 150m + 4x50m pernada + 4x50m palmar + 4x50m nadadeira + 100m", "warm_pm": "leve", "sess_pm_title": "Academia leve + calistenia", "sess_pm": "Leg press 3x12 leve, remada baixa polia 3x12, calistenia leve + alongamento", "meta": "Sem carga pesada, variar estímulo"}, {"date_iso": "2026-08-27", "date": "27/08", "weekday": "Qui", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Missão de Força", "warm_am": "8-10min", "sess_am_title": "Força MI #2", "sess_am": "Levantamento terra, 5x5 pesado (~130kg); agachamento leve 3x8", "warm_pm": "leve", "sess_pm_title": "Corrida leve", "sess_pm": "20-25min zona 1", "meta": "Terra sem perder lombar neutra"}, {"date_iso": "2026-08-28", "date": "28/08", "weekday": "Sex", "type": "calistenia", "color": "#8b5cf6", "icon": "🤸", "label": "Treinamento de Combate", "warm_am": "5min", "sess_am_title": "Corrida leve", "sess_am": "20-25min zona 1 (recuperação ativa)", "warm_pm": "-", "sess_pm_title": "Progressão Barra", "sess_pm": "4-5 séries pronada estrita, desc 2min", "meta": "12 barras total (baseline 11)"}, {"date_iso": "2026-08-29", "date": "29/08", "weekday": "Sáb", "type": "corrida", "color": "#2e8b57", "icon": "🏃", "label": "Missão de Corrida", "warm_am": "10min + tiros progressivos 80-100m", "sess_am_title": "Corrida intervalada #2", "sess_am": "4x1200m ritmo limiar, 2min trote", "warm_pm": "leve", "sess_pm_title": "Calistenia + academia (core)", "sess_pm": "Abdominal 3-4 séries + prancha rotação 3x30-40s cada lado", "meta": "1200m ≤4:10/km, 65 abdominais total (baseline 60)"}, {"date_iso": "2026-08-30", "date": "30/08", "weekday": "Dom", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação Tática", "warm_am": "3-5min", "sess_am_title": "Natação leve", "sess_am": "25min: 200m + 4x50m nadadeira + 100m", "warm_pm": "não precisa", "sess_pm_title": "Descanso ativo", "sess_pm": "Caminhada + alongamento", "meta": "Recuperar de verdade, sem número"}, {"date_iso": "2026-08-31", "date": "31/08", "weekday": "Seg (sem natação)", "type": "explosivo", "color": "#d64545", "icon": "⚡", "label": "Missão de Potência", "warm_am": "8-10min", "sess_am_title": "Explosivo #2", "sess_am": "5x6 saltos + 6 sprints 20m + 2 sprints 40m", "warm_pm": "leve", "sess_pm_title": "Calistenia leve", "sess_pm": "Agachamento, 4 séries peso corpo quase à falha", "meta": "100 agachamentos total (baseline 95)"}, {"date_iso": "2026-09-01", "date": "01/09", "weekday": "Ter", "type": "academia", "color": "#a9772f", "icon": "💪", "label": "Missão de Academia", "warm_am": "5min", "sess_am_title": "Natação técnica", "sess_am": "30min: 150m + 4x50m palmar + 4x50m pernada + 4x50m nadadeira progressivo + 100m", "warm_pm": "mobilidade de ombro", "sess_pm_title": "Academia leve", "sess_pm": "Supino (primeira vez testando, 3-4 séries carga confortável) + flexões 3 séries quase à falha", "meta": "Anotar carga do supino, 45 flexões (checkpoint)"}, {"date_iso": "2026-09-02", "date": "02/09", "weekday": "Qua", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Força — Pico da Operação", "warm_am": "8-10min", "sess_am_title": "Força MI #3", "sess_am": "Agachamento 4x4 (~85-88%) + Terra 3x3 (~85%)", "warm_pm": "2-3min", "sess_pm_title": "Corrida bem leve", "sess_pm": "15min zona 1", "meta": "Sentir força com boa técnica, sem recorde"}, {"date_iso": "2026-09-03", "date": "03/09", "weekday": "Qui", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação Tática", "warm_am": "3-5min", "sess_am_title": "Corrida bem leve", "sess_am": "15min + 3 strides 15m", "warm_pm": "não precisa", "sess_pm_title": "Descanso/mobilidade leve", "sess_pm": "-", "meta": "Chegar descansado amanhã"}, {"date_iso": "2026-09-04", "date": "04/09", "weekday": "Sex", "type": "fechamento", "color": "#3d6fb4", "icon": "🏁", "label": "Encerramento da Operação", "warm_am": "5-8min", "sess_am_title": "Corrida moderada", "sess_am": "20min forte-controlado (não é teste)", "warm_pm": "leve", "sess_pm_title": "Academia leve + calistenia", "sess_pm": "Leg press/remada/supino à escolha", "meta": "Fechar bem, sem cobrar resultado; volta a 1x/dia no dia seguinte"}]};
+
+const QUOTES = [
+  {text: "Você tem poder sobre sua mente, não sobre eventos externos. Perceba isso e encontrará força.", author: "Marco Aurélio"},
+  {text: "Não é porque as coisas são difíceis que não ousamos; é porque não ousamos que elas são difíceis.", author: "Sêneca"},
+  {text: "Primeiro decida quem você quer ser. Depois faça o que precisa ser feito.", author: "Epicteto"},
+  {text: "O obstáculo no caminho torna-se o caminho.", author: "Marco Aurélio"},
+  {text: "Sofremos mais na imaginação do que na realidade.", author: "Sêneca"},
+  {text: "Não exija que os fatos aconteçam como você quer; deseje que aconteçam como acontecem, e terá paz.", author: "Epicteto"},
+  {text: "Perdemos a vida em pequenos pedaços enquanto adiamos viver de verdade.", author: "Sêneca"},
+  {text: "A queixa é o começo da derrota.", author: "Código do Guerreiro"},
+  {text: "Com o escudo, ou sobre ele.", author: "Provérbio Espartano"},
+  {text: "Que suas ações falem, não suas palavras.", author: "Provérbio Espartano"},
+  {text: "Conheça o inimigo e conheça a si mesmo; em cem batalhas, cem vitórias.", author: "Sun Tzu"},
+  {text: "A oportunidade surge quando se cria uma desordem no adversário.", author: "Sun Tzu"},
+  {text: "O corpo atinge o que a mente acredita.", author: "Doutrina de Combate"},
+  {text: "Disciplina é escolher entre o que você quer agora e o que você quer de verdade.", author: "Código do Guerreiro"},
+  {text: "A dor é temporária. Desistir dura para sempre.", author: "Doutrina de Combate"},
+  {text: "Não é o crítico que conta, é quem está na arena, coberto de suor e poeira.", author: "Theodore Roosevelt"},
+  {text: "Levante-se, soldado. A missão não se cumpre sozinha.", author: "Doutrina de Combate"},
+  {text: "Toda vantagem foi antes um treino que ninguém viu.", author: "Código do Guerreiro"},
+  {text: "Não temas a lentidão, teme apenas parar.", author: "Provérbio Chinês"},
+  {text: "Vencer não vale nada sem a vontade de se preparar.", author: "Código do Guerreiro"},
+  {text: "No treino, sangre. Na missão, vença.", author: "Doutrina de Combate"},
+  {text: "Um homem que conquistou seus medos é verdadeiramente livre.", author: "Epicteto"},
+  {text: "É difícil dominar a arte de viver bem; para isso é preciso estudar a vida inteira.", author: "Sêneca"},
+  {text: "Concentre-se no que está sob seu controle, deixe o resto seguir seu curso.", author: "Epicteto"},
+  {text: "Cada amanhecer é uma nova missão; cada obstáculo, um teste de caráter.", author: "Doutrina de Combate"},
+  {text: "Suor economizado em treino é sangue poupado em combate.", author: "Ditado Militar"},
+  {text: "Não conte os dias, faça os dias contarem.", author: "Código do Guerreiro"},
+  {text: "A calma é uma vantagem tática.", author: "Doutrina de Combate"},
+  {text: "O guerreiro não nasce pronto; ele se forja repetição após repetição.", author: "Código do Guerreiro"},
+  {text: "Domine o corpo, e a mente seguirá.", author: "Bushido"},
+];
+
+function dayOfYear(d) {
+  const start = new Date(d.getFullYear(), 0, 0);
+  return Math.floor((d - start) / 86400000);
+}
+
+function renderQuote() {
+  const q = QUOTES[dayOfYear(new Date()) % QUOTES.length];
+  document.getElementById('quoteBanner').innerHTML =
+    `<div class="qtext">"${q.text}"</div><div class="qauthor">— ${q.author}</div>`;
+}
 
 function fmtMin(min) {
   const h = Math.floor(min/60), m = Math.round(min%60);
@@ -252,11 +302,11 @@ function renderPlan() {
         <label class="check"><input type="checkbox" ${pmChecked ? 'checked' : ''} data-date="${d.date_iso}" data-slot="pm"> <strong>Tarde — ${d.sess_pm_title}</strong></label>
         <div class="plan-desc">${d.sess_pm}</div>
       </div>
-      <div class="plan-meta">🎯 Meta do dia: ${d.meta}</div>
+      <div class="plan-meta">🎯 Objetivo da missão: ${d.meta}</div>
       <div class="plan-registro">
         <span>PSE:</span>
         <select class="pse-select" data-date="${d.date_iso}"><option value="">-</option>${pseOptions}</select>
-        <input type="text" class="notas-input" data-date="${d.date_iso}" placeholder="notas (opcional)" value="${notasVal}">
+        <input type="text" class="notas-input" data-date="${d.date_iso}" placeholder="relatório (opcional)" value="${notasVal}">
       </div>
     </div>`;
   }).join('');
@@ -288,6 +338,7 @@ function renderPlan() {
 }
 
 async function initDashboard() {
+  renderQuote();
   loadLocalCache();
   renderPlan();
   syncFromRemote().then(ok => { if (ok) renderPlan(); });
@@ -310,15 +361,15 @@ async function initDashboard() {
     data: {
       labels: DATA.week_labels,
       datasets: [
-        {label: 'Corrida', data: DATA.weekly_volume.Run, backgroundColor: '#ff6b4a', borderRadius: 4},
-        {label: 'Natação', data: DATA.weekly_volume.Swim, backgroundColor: '#14b8a6', borderRadius: 4},
-        {label: 'Workout', data: DATA.weekly_volume.Workout, backgroundColor: '#8b5cf6', borderRadius: 4}
+        {label: 'Corrida', data: DATA.weekly_volume.Run, backgroundColor: '#7a9b3f', borderRadius: 4},
+        {label: 'Natação', data: DATA.weekly_volume.Swim, backgroundColor: '#5c88ad', borderRadius: 4},
+        {label: 'Workout', data: DATA.weekly_volume.Workout, backgroundColor: '#b39b5e', borderRadius: 4}
       ]
     },
     options: {
       responsive: true,
-      scales: { x: { stacked: true, ticks:{color:'#8a8175'}, grid:{display:false} }, y: { stacked: true, ticks:{color:'#8a8175'}, grid:{color:'#ece5d8'} } },
-      plugins: { legend: { labels: { color: '#2b2620' } } }
+      scales: { x: { stacked: true, ticks:{color:'#8f9581'}, grid:{display:false} }, y: { stacked: true, ticks:{color:'#8f9581'}, grid:{color:'#333a27'} } },
+      plugins: { legend: { labels: { color: '#e9e4d3' } } }
     }
   });
 
@@ -329,12 +380,12 @@ async function initDashboard() {
     type: 'line',
     data: {
       labels: paceLabels,
-      datasets: [{ label: 'Ritmo (min/km)', data: paceValues, borderColor: '#ff6b4a', backgroundColor: 'rgba(255,107,74,0.12)', tension: 0.3, pointRadius: 2, pointBackgroundColor: '#ff6b4a' }]
+      datasets: [{ label: 'Ritmo (min/km)', data: paceValues, borderColor: '#7a9b3f', backgroundColor: 'rgba(122,155,63,0.15)', tension: 0.3, pointRadius: 2, pointBackgroundColor: '#7a9b3f' }]
     },
     options: {
       responsive: true,
-      scales: { y: { reverse: true, ticks:{color:'#8a8175'}, grid:{color:'#ece5d8'} }, x: { ticks:{color:'#8a8175', maxTicksLimit: 10}, grid:{display:false} } },
-      plugins: { legend: { labels: { color: '#2b2620' } } }
+      scales: { y: { reverse: true, ticks:{color:'#8f9581'}, grid:{color:'#333a27'} }, x: { ticks:{color:'#8f9581', maxTicksLimit: 10}, grid:{display:false} } },
+      plugins: { legend: { labels: { color: '#e9e4d3' } } }
     }
   });
 
@@ -343,12 +394,12 @@ async function initDashboard() {
     type: 'line',
     data: {
       labels: DATA.cal_series.map(c => c.week),
-      datasets: [{ label: 'Calorias', data: DATA.cal_series.map(c => c.cal), borderColor: '#ffb648', backgroundColor: 'rgba(255,182,72,0.18)', tension: 0.3, fill: true, pointRadius: 2, pointBackgroundColor: '#ffb648' }]
+      datasets: [{ label: 'Calorias', data: DATA.cal_series.map(c => c.cal), borderColor: '#d98a3d', backgroundColor: 'rgba(217,138,61,0.18)', tension: 0.3, fill: true, pointRadius: 2, pointBackgroundColor: '#d98a3d' }]
     },
     options: {
       responsive: true,
-      scales: { y: { ticks:{color:'#8a8175'}, grid:{color:'#ece5d8'} }, x: { ticks:{color:'#8a8175', maxTicksLimit: 10}, grid:{display:false} } },
-      plugins: { legend: { labels: { color: '#2b2620' } } }
+      scales: { y: { ticks:{color:'#8f9581'}, grid:{color:'#333a27'} }, x: { ticks:{color:'#8f9581', maxTicksLimit: 10}, grid:{display:false} } },
+      plugins: { legend: { labels: { color: '#e9e4d3' } } }
     }
   });
 
