@@ -165,7 +165,6 @@ async function tryUnlock() {
   const val = document.getElementById('pwInput').value;
   const hash = await sha256Hex(val);
   if (hash === PW_HASH) {
-    localStorage.setItem('treinos_unlocked', '1');
     unlockApp();
   } else {
     const gate = document.getElementById('gate');
@@ -380,9 +379,6 @@ async function initDashboard() {
   `).join('');
 }
 
-if (localStorage.getItem('treinos_unlocked') === '1') {
-  unlockApp();
-}
 </script>
 </body>
 </html>
