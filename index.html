@@ -47,6 +47,22 @@
   .pill-Workout { background: rgba(139,92,246,0.14); color: var(--violet); }
   footer { text-align: center; color: var(--muted); font-size: 0.74rem; margin-top: 34px; }
 
+  .plan-progress { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
+  .plan-progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .plan-progress-fill { height: 100%; background: var(--coral); transition: width 0.2s; }
+  .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(43,38,32,0.04); }
+  .plan-banner { padding: 10px 14px; font-weight: 700; font-size: 0.9rem; color: #fff; }
+  .plan-row { padding: 10px 14px; border-top: 1px solid var(--border); font-size: 0.85rem; }
+  .plan-row.warm { color: var(--muted); font-size: 0.76rem; font-style: italic; background: #fdf6ee; }
+  .plan-row.sess label.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .plan-row.sess input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--coral); flex-shrink: 0; }
+  .plan-desc { margin-top: 4px; margin-left: 26px; color: var(--ink); }
+  .plan-row.sess.done strong, .plan-row.sess.done .plan-desc { text-decoration: line-through; color: var(--muted); }
+  .plan-meta { padding: 10px 14px; background: #fff8e1; border-top: 1px solid var(--border); font-size: 0.82rem; font-weight: 600; }
+  .plan-registro { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); }
+  .plan-registro select, .plan-registro input[type=text] { border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; font-family: inherit; color: var(--ink); }
+  .plan-registro input[type=text] { flex: 1; min-width: 90px; }
+
   #gate {
     position: fixed; inset: 0; z-index: 999;
     background: linear-gradient(160deg, #2b2620 0%, #40332a 100%);
@@ -85,6 +101,12 @@
   <div class="sub">Hugo · atualizado em 19/08/2026 · direto do Strava</div>
 
   <div class="cards" id="summaryCards"></div>
+
+  <section>
+    <h2>📋 Plano de treino (bloco 21/08–04/09)</h2>
+    <div id="planProgress" class="plan-progress"></div>
+    <div id="planCards"></div>
+  </section>
 
   <section>
     <h2>📊 Volume semanal por modalidade (km)</h2>
@@ -149,14 +171,79 @@ async function tryUnlock() {
 document.getElementById('pwBtn').addEventListener('click', tryUnlock);
 document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
 
-const DATA = {"generated_at": "19/08/2026", "week_labels": ["18/05", "25/05", "01/06", "08/06", "15/06", "22/06", "29/06", "06/07", "13/07", "20/07", "27/07", "03/08", "10/08", "17/08"], "weekly_volume": {"Run": [17.9, 3.0, 12.3, 12.6, 11.0, 4.0, 37.6, 24.6, 43.0, 45.9, 17.3, 10.8, 16.9, 8.0], "Swim": [0.0, 1.1, 1.0, 0.0, 3.0, 1.8, 2.0, 0.0, 0.5, 4.8, 7.8, 0.0, 0.0, 0.0], "Workout": [0.0, 1.6, 2.1, 1.8, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.5]}, "cal_series": [{"week": "18/05", "cal": 1433}, {"week": "25/05", "cal": 954}, {"week": "01/06", "cal": 1546}, {"week": "08/06", "cal": 1243}, {"week": "15/06", "cal": 2131}, {"week": "22/06", "cal": 1274}, {"week": "29/06", "cal": 4412}, {"week": "06/07", "cal": 2251}, {"week": "13/07", "cal": 3704}, {"week": "20/07", "cal": 5464}, {"week": "27/07", "cal": 3613}, {"week": "03/08", "cal": 878}, {"week": "10/08", "cal": 1263}, {"week": "17/08", "cal": 1331}], "run_pace_series": [{"date": "22/05", "pace": 5.75}, {"date": "24/05", "pace": 5.69}, {"date": "29/05", "pace": 4.77}, {"date": "05/06", "pace": 5.56}, {"date": "06/06", "pace": 5.22}, {"date": "10/06", "pace": 5.23}, {"date": "12/06", "pace": 5.1}, {"date": "14/06", "pace": 5.31}, {"date": "17/06", "pace": 5.4}, {"date": "20/06", "pace": 5.56}, {"date": "27/06", "pace": 8.76}, {"date": "29/06", "pace": 8.91}, {"date": "29/06", "pace": 5.3}, {"date": "30/06", "pace": 6.36}, {"date": "02/07", "pace": 5.7}, {"date": "05/07", "pace": 5.83}, {"date": "06/07", "pace": 6.3}, {"date": "09/07", "pace": 9.45}, {"date": "13/07", "pace": 5.88}, {"date": "15/07", "pace": 4.58}, {"date": "16/07", "pace": 6.76}, {"date": "17/07", "pace": 6.02}, {"date": "18/07", "pace": 5.48}, {"date": "19/07", "pace": 10.18}, {"date": "20/07", "pace": 5.93}, {"date": "21/07", "pace": 7.09}, {"date": "23/07", "pace": 6.42}, {"date": "25/07", "pace": 5.55}, {"date": "27/07", "pace": 7.68}, {"date": "29/07", "pace": 10.94}, {"date": "31/07", "pace": 8.25}, {"date": "05/08", "pace": 4.21}, {"date": "07/08", "pace": 5.66}, {"date": "10/08", "pace": 6.24}, {"date": "12/08", "pace": 4.97}, {"date": "14/08", "pace": 4.2}, {"date": "19/08", "pace": 5.05}], "summary_7": {"by_sport": {"Run": {"dist": 13.9, "dur": 95, "count": 3, "cal": 1083}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 1757, "total_sessions": 4}, "summary_30": {"by_sport": {"Run": {"dist": 90.7, "dur": 640, "count": 14, "cal": 7771}, "Swim": {"dist": 12.6, "dur": 281, "count": 5, "cal": 3409}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 11854, "total_sessions": 20}, "recent": [{"date": "19/08 16:12", "name": "Corrida da tarde", "sport": "Run", "dist": 8.02, "dur": 40.5, "cal": 657, "pace": "5:03/km"}, {"date": "17/08 17:54", "name": "Treino vespertino", "sport": "Workout", "dist": 5.54, "dur": 44.2, "cal": 674, "pace": ""}, {"date": "14/08 09:34", "name": "Corrida matinal", "sport": "Run", "dist": 2.95, "dur": 12.4, "cal": 230, "pace": "4:12/km"}, {"date": "13/08 11:40", "name": "Lunch Run", "sport": "Run", "dist": 2.93, "dur": 41.9, "cal": 196, "pace": "14:18/km"}, {"date": "12/08 09:17", "name": "Morning Run", "sport": "Run", "dist": 3.66, "dur": 18.2, "cal": 222, "pace": "4:58/km"}, {"date": "10/08 09:19", "name": "Morning Run", "sport": "Run", "dist": 7.32, "dur": 45.7, "cal": 615, "pace": "6:15/km"}, {"date": "07/08 18:17", "name": "Corrida ao entardecer", "sport": "Run", "dist": 7.93, "dur": 44.9, "cal": 708, "pace": "5:40/km"}, {"date": "05/08 09:29", "name": "Morning Run", "sport": "Run", "dist": 2.92, "dur": 12.3, "cal": 170, "pace": "4:13/km"}, {"date": "31/07 11:50", "name": "Natação na hora do almoço", "sport": "Swim", "dist": 3.93, "dur": 63.3, "cal": 859, "pace": ""}, {"date": "31/07 10:31", "name": "Corrida matinal", "sport": "Run", "dist": 7.03, "dur": 58.0, "cal": 558, "pace": "8:15/km"}, {"date": "29/07 11:16", "name": "Lunch Run", "sport": "Run", "dist": 3.84, "dur": 42.0, "cal": 367, "pace": "10:56/km"}, {"date": "29/07 09:09", "name": "Morning Swim", "sport": "Swim", "dist": 2.45, "dur": 90.8, "cal": 837, "pace": ""}, {"date": "27/07 10:42", "name": "Morning Run", "sport": "Run", "dist": 6.46, "dur": 49.6, "cal": 552, "pace": "7:41/km"}, {"date": "27/07 09:33", "name": "Morning Swim", "sport": "Swim", "dist": 1.45, "dur": 34.2, "cal": 440, "pace": ""}, {"date": "25/07 12:45", "name": "Lunch Run", "sport": "Run", "dist": 10.0, "dur": 55.5, "cal": 828, "pace": "5:33/km"}], "zones": {"hr": [{"z": "Z1", "min": 0, "max": 127}, {"z": "Z2", "min": 128, "max": 158}, {"z": "Z3", "min": 159, "max": 174}, {"z": "Z4", "min": 175, "max": 189}, {"z": "Z5", "min": 190, "max": null}], "run_pace": [{"z": "Z1", "min": null, "max": 2.569}, {"z": "Z2", "min": 2.569, "max": 2.985}, {"z": "Z3", "min": 2.985, "max": 3.325}, {"z": "Z4", "min": 3.325, "max": 3.551}, {"z": "Z5", "min": 3.551, "max": null}], "ftp": 133}};
+const DATA = {"generated_at": "19/08/2026", "week_labels": ["18/05", "25/05", "01/06", "08/06", "15/06", "22/06", "29/06", "06/07", "13/07", "20/07", "27/07", "03/08", "10/08", "17/08"], "weekly_volume": {"Run": [17.9, 3.0, 12.3, 12.6, 11.0, 4.0, 37.6, 24.6, 43.0, 45.9, 17.3, 10.8, 16.9, 8.0], "Swim": [0.0, 1.1, 1.0, 0.0, 3.0, 1.8, 2.0, 0.0, 0.5, 4.8, 7.8, 0.0, 0.0, 0.0], "Workout": [0.0, 1.6, 2.1, 1.8, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.5]}, "cal_series": [{"week": "18/05", "cal": 1433}, {"week": "25/05", "cal": 954}, {"week": "01/06", "cal": 1546}, {"week": "08/06", "cal": 1243}, {"week": "15/06", "cal": 2131}, {"week": "22/06", "cal": 1274}, {"week": "29/06", "cal": 4412}, {"week": "06/07", "cal": 2251}, {"week": "13/07", "cal": 3704}, {"week": "20/07", "cal": 5464}, {"week": "27/07", "cal": 3613}, {"week": "03/08", "cal": 878}, {"week": "10/08", "cal": 1263}, {"week": "17/08", "cal": 1331}], "run_pace_series": [{"date": "22/05", "pace": 5.75}, {"date": "24/05", "pace": 5.69}, {"date": "29/05", "pace": 4.77}, {"date": "05/06", "pace": 5.56}, {"date": "06/06", "pace": 5.22}, {"date": "10/06", "pace": 5.23}, {"date": "12/06", "pace": 5.1}, {"date": "14/06", "pace": 5.31}, {"date": "17/06", "pace": 5.4}, {"date": "20/06", "pace": 5.56}, {"date": "27/06", "pace": 8.76}, {"date": "29/06", "pace": 8.91}, {"date": "29/06", "pace": 5.3}, {"date": "30/06", "pace": 6.36}, {"date": "02/07", "pace": 5.7}, {"date": "05/07", "pace": 5.83}, {"date": "06/07", "pace": 6.3}, {"date": "09/07", "pace": 9.45}, {"date": "13/07", "pace": 5.88}, {"date": "15/07", "pace": 4.58}, {"date": "16/07", "pace": 6.76}, {"date": "17/07", "pace": 6.02}, {"date": "18/07", "pace": 5.48}, {"date": "19/07", "pace": 10.18}, {"date": "20/07", "pace": 5.93}, {"date": "21/07", "pace": 7.09}, {"date": "23/07", "pace": 6.42}, {"date": "25/07", "pace": 5.55}, {"date": "27/07", "pace": 7.68}, {"date": "29/07", "pace": 10.94}, {"date": "31/07", "pace": 8.25}, {"date": "05/08", "pace": 4.21}, {"date": "07/08", "pace": 5.66}, {"date": "10/08", "pace": 6.24}, {"date": "12/08", "pace": 4.97}, {"date": "14/08", "pace": 4.2}, {"date": "19/08", "pace": 5.05}], "summary_7": {"by_sport": {"Run": {"dist": 13.9, "dur": 95, "count": 3, "cal": 1083}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 1757, "total_sessions": 4}, "summary_30": {"by_sport": {"Run": {"dist": 90.7, "dur": 640, "count": 14, "cal": 7771}, "Swim": {"dist": 12.6, "dur": 281, "count": 5, "cal": 3409}, "Workout": {"dist": 5.5, "dur": 44, "count": 1, "cal": 674}}, "total_cal": 11854, "total_sessions": 20}, "recent": [{"date": "19/08 16:12", "name": "Corrida da tarde", "sport": "Run", "dist": 8.02, "dur": 40.5, "cal": 657, "pace": "5:03/km"}, {"date": "17/08 17:54", "name": "Treino vespertino", "sport": "Workout", "dist": 5.54, "dur": 44.2, "cal": 674, "pace": ""}, {"date": "14/08 09:34", "name": "Corrida matinal", "sport": "Run", "dist": 2.95, "dur": 12.4, "cal": 230, "pace": "4:12/km"}, {"date": "13/08 11:40", "name": "Lunch Run", "sport": "Run", "dist": 2.93, "dur": 41.9, "cal": 196, "pace": "14:18/km"}, {"date": "12/08 09:17", "name": "Morning Run", "sport": "Run", "dist": 3.66, "dur": 18.2, "cal": 222, "pace": "4:58/km"}, {"date": "10/08 09:19", "name": "Morning Run", "sport": "Run", "dist": 7.32, "dur": 45.7, "cal": 615, "pace": "6:15/km"}, {"date": "07/08 18:17", "name": "Corrida ao entardecer", "sport": "Run", "dist": 7.93, "dur": 44.9, "cal": 708, "pace": "5:40/km"}, {"date": "05/08 09:29", "name": "Morning Run", "sport": "Run", "dist": 2.92, "dur": 12.3, "cal": 170, "pace": "4:13/km"}, {"date": "31/07 11:50", "name": "Natação na hora do almoço", "sport": "Swim", "dist": 3.93, "dur": 63.3, "cal": 859, "pace": ""}, {"date": "31/07 10:31", "name": "Corrida matinal", "sport": "Run", "dist": 7.03, "dur": 58.0, "cal": 558, "pace": "8:15/km"}, {"date": "29/07 11:16", "name": "Lunch Run", "sport": "Run", "dist": 3.84, "dur": 42.0, "cal": 367, "pace": "10:56/km"}, {"date": "29/07 09:09", "name": "Morning Swim", "sport": "Swim", "dist": 2.45, "dur": 90.8, "cal": 837, "pace": ""}, {"date": "27/07 10:42", "name": "Morning Run", "sport": "Run", "dist": 6.46, "dur": 49.6, "cal": 552, "pace": "7:41/km"}, {"date": "27/07 09:33", "name": "Morning Swim", "sport": "Swim", "dist": 1.45, "dur": 34.2, "cal": 440, "pace": ""}, {"date": "25/07 12:45", "name": "Lunch Run", "sport": "Run", "dist": 10.0, "dur": 55.5, "cal": 828, "pace": "5:33/km"}], "zones": {"hr": [{"z": "Z1", "min": 0, "max": 127}, {"z": "Z2", "min": 128, "max": 158}, {"z": "Z3", "min": 159, "max": 174}, {"z": "Z4", "min": 175, "max": 189}, {"z": "Z5", "min": 190, "max": null}], "run_pace": [{"z": "Z1", "min": null, "max": 2.569}, {"z": "Z2", "min": 2.569, "max": 2.985}, {"z": "Z3", "min": 2.985, "max": 3.325}, {"z": "Z4", "min": 3.325, "max": 3.551}, {"z": "Z5", "min": 3.551, "max": null}], "ftp": 133}, "plan": [{"date_iso": "2026-08-21", "date": "21/08", "weekday": "Sex", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Dia de Força", "warm_am": "8-10min, mobilidade de quadril/tornozelo, aproximações", "sess_am_title": "Força MI #1", "sess_am": "Agachamento livre, 5x5 pesado (~perto de 105kg), 2-3min descanso; RDL leve 3x8", "warm_pm": "leve, soltar as pernas", "sess_pm_title": "Corrida leve", "sess_pm": "25min zona 1", "meta": "Fechar 5x5 sem perder técnica, PSE até 8"}, {"date_iso": "2026-08-22", "date": "22/08", "weekday": "Sáb", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação", "warm_am": "5min nado leve", "sess_am_title": "Natação técnica", "sess_am": "30-40min: 200m livre + 4x50m pernada c/ prancha + 4x50m nadadeira + 4x50m palmar (desc 20-30s) + fecha 200m livre", "warm_pm": "mobilidade de ombro/punho", "sess_pm_title": "Calistenia leve", "sess_pm": "2-3 séries flexão/barra/abdominal a 60-70%, foco em técnica", "meta": "Qualidade de movimento, sem meta de reps"}, {"date_iso": "2026-08-23", "date": "23/08", "weekday": "Dom", "type": "corrida", "color": "#2e8b57", "icon": "🏃", "label": "Dia de Corrida", "warm_am": "10min + educativos + tiros progressivos 60-80m", "sess_am_title": "Corrida intervalada #1", "sess_am": "8x400m forte, 75s trote entre tiros", "warm_pm": "leve", "sess_pm_title": "Calistenia leve", "sess_pm": "Flexão/barra/abdominal + prancha 3x40-60s", "meta": "Cada 400m ≤1:38 (pace ~4:08/km)"}, {"date_iso": "2026-08-24", "date": "24/08", "weekday": "Seg (sem natação)", "type": "calistenia", "color": "#8b5cf6", "icon": "🤸", "label": "Calistenia", "warm_am": "5-6min", "sess_am_title": "Corrida leve", "sess_am": "20min + 4 strides de 20m", "warm_pm": "-", "sess_pm_title": "Progressão Flexões", "sess_pm": "4 séries quase à falha, desc 60-90s, descida 2s/subida 1s", "meta": "Somar 42 flexões (baseline 40)"}, {"date_iso": "2026-08-25", "date": "25/08", "weekday": "Ter", "type": "explosivo", "color": "#d64545", "icon": "⚡", "label": "Dia Explosivo", "warm_am": "8-10min + mobilidade dinâmica + ativação", "sess_am_title": "Explosivo #1", "sess_am": "Saltos/sprints: 5x5 saltos explosivos + 6 sprints 20m + 2 sprints 30m máximos", "warm_pm": "leve", "sess_pm_title": "Natação leve técnica", "sess_pm": "25min: 150m + 4x50m nadadeira + 200m", "meta": "Sprints máximos sem perder forma"}, {"date_iso": "2026-08-26", "date": "26/08", "weekday": "Qua", "type": "academia", "color": "#a9772f", "icon": "💪", "label": "Dia de Academia", "warm_am": "5min", "sess_am_title": "Natação técnica", "sess_am": "30min: 150m + 4x50m pernada + 4x50m palmar + 4x50m nadadeira + 100m", "warm_pm": "leve", "sess_pm_title": "Academia leve + calistenia", "sess_pm": "Leg press 3x12 leve, remada baixa polia 3x12, calistenia leve + alongamento", "meta": "Sem carga pesada, variar estímulo"}, {"date_iso": "2026-08-27", "date": "27/08", "weekday": "Qui", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Dia de Força", "warm_am": "8-10min", "sess_am_title": "Força MI #2", "sess_am": "Levantamento terra, 5x5 pesado (~130kg); agachamento leve 3x8", "warm_pm": "leve", "sess_pm_title": "Corrida leve", "sess_pm": "20-25min zona 1", "meta": "Terra sem perder lombar neutra"}, {"date_iso": "2026-08-28", "date": "28/08", "weekday": "Sex", "type": "calistenia", "color": "#8b5cf6", "icon": "🤸", "label": "Calistenia", "warm_am": "5min", "sess_am_title": "Corrida leve", "sess_am": "20-25min zona 1 (recuperação ativa)", "warm_pm": "-", "sess_pm_title": "Progressão Barra", "sess_pm": "4-5 séries pronada estrita, desc 2min", "meta": "12 barras total (baseline 11)"}, {"date_iso": "2026-08-29", "date": "29/08", "weekday": "Sáb", "type": "corrida", "color": "#2e8b57", "icon": "🏃", "label": "Dia de Corrida", "warm_am": "10min + tiros progressivos 80-100m", "sess_am_title": "Corrida intervalada #2", "sess_am": "4x1200m ritmo limiar, 2min trote", "warm_pm": "leve", "sess_pm_title": "Calistenia + academia (core)", "sess_pm": "Abdominal 3-4 séries + prancha rotação 3x30-40s cada lado", "meta": "1200m ≤4:10/km, 65 abdominais total (baseline 60)"}, {"date_iso": "2026-08-30", "date": "30/08", "weekday": "Dom", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação", "warm_am": "3-5min", "sess_am_title": "Natação leve", "sess_am": "25min: 200m + 4x50m nadadeira + 100m", "warm_pm": "não precisa", "sess_pm_title": "Descanso ativo", "sess_pm": "Caminhada + alongamento", "meta": "Recuperar de verdade, sem número"}, {"date_iso": "2026-08-31", "date": "31/08", "weekday": "Seg (sem natação)", "type": "explosivo", "color": "#d64545", "icon": "⚡", "label": "Dia Explosivo", "warm_am": "8-10min", "sess_am_title": "Explosivo #2", "sess_am": "5x6 saltos + 6 sprints 20m + 2 sprints 40m", "warm_pm": "leve", "sess_pm_title": "Calistenia leve", "sess_pm": "Agachamento, 4 séries peso corpo quase à falha", "meta": "100 agachamentos total (baseline 95)"}, {"date_iso": "2026-09-01", "date": "01/09", "weekday": "Ter", "type": "academia", "color": "#a9772f", "icon": "💪", "label": "Dia de Academia", "warm_am": "5min", "sess_am_title": "Natação técnica", "sess_am": "30min: 150m + 4x50m palmar + 4x50m pernada + 4x50m nadadeira progressivo + 100m", "warm_pm": "mobilidade de ombro", "sess_pm_title": "Academia leve", "sess_pm": "Supino (primeira vez testando, 3-4 séries carga confortável) + flexões 3 séries quase à falha", "meta": "Anotar carga do supino, 45 flexões (checkpoint)"}, {"date_iso": "2026-09-02", "date": "02/09", "weekday": "Qua", "type": "forca", "color": "#3b4b7a", "icon": "🏋️", "label": "Força (pico do bloco)", "warm_am": "8-10min", "sess_am_title": "Força MI #3", "sess_am": "Agachamento 4x4 (~85-88%) + Terra 3x3 (~85%)", "warm_pm": "2-3min", "sess_pm_title": "Corrida bem leve", "sess_pm": "15min zona 1", "meta": "Sentir força com boa técnica, sem recorde"}, {"date_iso": "2026-09-03", "date": "03/09", "weekday": "Qui", "type": "recuperacao", "color": "#14b8a6", "icon": "😌", "label": "Recuperação", "warm_am": "3-5min", "sess_am_title": "Corrida bem leve", "sess_am": "15min + 3 strides 15m", "warm_pm": "não precisa", "sess_pm_title": "Descanso/mobilidade leve", "sess_pm": "-", "meta": "Chegar descansado amanhã"}, {"date_iso": "2026-09-04", "date": "04/09", "weekday": "Sex", "type": "fechamento", "color": "#3d6fb4", "icon": "🏁", "label": "Fechamento do Bloco", "warm_am": "5-8min", "sess_am_title": "Corrida moderada", "sess_am": "20min forte-controlado (não é teste)", "warm_pm": "leve", "sess_pm_title": "Academia leve + calistenia", "sess_pm": "Leg press/remada/supino à escolha", "meta": "Fechar bem, sem cobrar resultado; volta a 1x/dia no dia seguinte"}]};
 
 function fmtMin(min) {
   const h = Math.floor(min/60), m = Math.round(min%60);
   return h > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${m}min`;
 }
 
+function renderPlan() {
+  const wrap = document.getElementById('planCards');
+  if (!DATA.plan || !DATA.plan.length) { wrap.innerHTML = ''; return; }
+  let doneCount = 0;
+  const total = DATA.plan.length * 2;
+  const html = DATA.plan.map(d => {
+    const amKey = `plan_${d.date_iso}_am`;
+    const pmKey = `plan_${d.date_iso}_pm`;
+    const pseKey = `plan_${d.date_iso}_pse`;
+    const notasKey = `plan_${d.date_iso}_notas`;
+    const amChecked = localStorage.getItem(amKey) === '1';
+    const pmChecked = localStorage.getItem(pmKey) === '1';
+    if (amChecked) doneCount++;
+    if (pmChecked) doneCount++;
+    const pseVal = localStorage.getItem(pseKey) || '';
+    const notasVal = (localStorage.getItem(notasKey) || '').replace(/"/g, '&quot;');
+    const pseOptions = Array.from({length: 10}, (_, i) => i + 1)
+      .map(n => `<option value="${n}" ${String(n) === pseVal ? 'selected' : ''}>${n}</option>`).join('');
+    return `
+    <div class="plan-card">
+      <div class="plan-banner" style="background:${d.color}">${d.icon} ${d.date} ${d.weekday} — ${d.label}</div>
+      <div class="plan-row warm">🔸 Aquecimento (manhã): ${d.warm_am}</div>
+      <div class="plan-row sess ${amChecked ? 'done' : ''}">
+        <label class="check"><input type="checkbox" ${amChecked ? 'checked' : ''} data-date="${d.date_iso}" data-slot="am"> <strong>Manhã — ${d.sess_am_title}</strong></label>
+        <div class="plan-desc">${d.sess_am}</div>
+      </div>
+      <div class="plan-row warm">🔸 Aquecimento (tarde): ${d.warm_pm}</div>
+      <div class="plan-row sess ${pmChecked ? 'done' : ''}">
+        <label class="check"><input type="checkbox" ${pmChecked ? 'checked' : ''} data-date="${d.date_iso}" data-slot="pm"> <strong>Tarde — ${d.sess_pm_title}</strong></label>
+        <div class="plan-desc">${d.sess_pm}</div>
+      </div>
+      <div class="plan-meta">🎯 Meta do dia: ${d.meta}</div>
+      <div class="plan-registro">
+        <span>PSE:</span>
+        <select class="pse-select" data-date="${d.date_iso}"><option value="">-</option>${pseOptions}</select>
+        <input type="text" class="notas-input" data-date="${d.date_iso}" placeholder="notas (opcional)" value="${notasVal}">
+      </div>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = html;
+
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+  document.getElementById('planProgress').innerHTML =
+    `${doneCount}/${total} sessões concluídas<div class="plan-progress-bar"><div class="plan-progress-fill" style="width:${pct}%"></div></div>`;
+
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      localStorage.setItem(`plan_${e.target.dataset.date}_${e.target.dataset.slot}`, e.target.checked ? '1' : '0');
+      renderPlan();
+    });
+  });
+  wrap.querySelectorAll('.pse-select').forEach(sel => {
+    sel.addEventListener('change', e => {
+      localStorage.setItem(`plan_${e.target.dataset.date}_pse`, e.target.value);
+    });
+  });
+  wrap.querySelectorAll('.notas-input').forEach(inp => {
+    inp.addEventListener('change', e => {
+      localStorage.setItem(`plan_${e.target.dataset.date}_notas`, e.target.value);
+    });
+  });
+}
+
 function initDashboard() {
+  renderPlan();
+
   // summary cards (7 dias)
   const s7 = DATA.summary_7;
   const cardsEl = document.getElementById('summaryCards');
