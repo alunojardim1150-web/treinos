@@ -146,6 +146,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
 const PW_HASH = "efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696";
+const JSONBIN_ID = "6a87ab49f5f4af5e292f470e";
+const JSONBIN_ACCESS_KEY = "$2a$10$pljbYsV5RZpBkmUZxSaObe2aQAdv3gMaOMCabN8HY1z/BanRYoEV6";
+const JSONBIN_READ_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}/latest`;
+const JSONBIN_WRITE_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+const LOCAL_CACHE_KEY = 'plan_sync_cache';
 
 async function sha256Hex(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -178,22 +183,61 @@ function fmtMin(min) {
   return h > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${m}min`;
 }
 
+let planState = { checkboxes: {}, pse: {}, notas: {} };
+
+function loadLocalCache() {
+  try {
+    const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+    if (raw) planState = Object.assign({ checkboxes: {}, pse: {}, notas: {} }, JSON.parse(raw));
+  } catch (e) { /* cache local vazio ou inválido, segue com estado padrão */ }
+}
+
+function saveLocalCache() {
+  localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(planState));
+}
+
+async function syncFromRemote() {
+  try {
+    const res = await fetch(JSONBIN_READ_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.record) {
+        planState = Object.assign({ checkboxes: {}, pse: {}, notas: {} }, json.record);
+        saveLocalCache();
+        return true;
+      }
+    }
+  } catch (e) { console.warn('Não consegui buscar o progresso salvo, usando cópia local.', e); }
+  return false;
+}
+
+let syncTimer = null;
+function syncToRemote() {
+  saveLocalCache();
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      await fetch(JSONBIN_WRITE_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Access-Key': JSONBIN_ACCESS_KEY },
+        body: JSON.stringify(planState)
+      });
+    } catch (e) { console.warn('Não consegui sincronizar agora, fica salvo só neste aparelho por enquanto.', e); }
+  }, 500);
+}
+
 function renderPlan() {
   const wrap = document.getElementById('planCards');
   if (!DATA.plan || !DATA.plan.length) { wrap.innerHTML = ''; return; }
   let doneCount = 0;
   const total = DATA.plan.length * 2;
   const html = DATA.plan.map(d => {
-    const amKey = `plan_${d.date_iso}_am`;
-    const pmKey = `plan_${d.date_iso}_pm`;
-    const pseKey = `plan_${d.date_iso}_pse`;
-    const notasKey = `plan_${d.date_iso}_notas`;
-    const amChecked = localStorage.getItem(amKey) === '1';
-    const pmChecked = localStorage.getItem(pmKey) === '1';
+    const amChecked = !!planState.checkboxes[`${d.date_iso}_am`];
+    const pmChecked = !!planState.checkboxes[`${d.date_iso}_pm`];
     if (amChecked) doneCount++;
     if (pmChecked) doneCount++;
-    const pseVal = localStorage.getItem(pseKey) || '';
-    const notasVal = (localStorage.getItem(notasKey) || '').replace(/"/g, '&quot;');
+    const pseVal = planState.pse[d.date_iso] || '';
+    const notasVal = (planState.notas[d.date_iso] || '').replace(/"/g, '&quot;');
     const pseOptions = Array.from({length: 10}, (_, i) => i + 1)
       .map(n => `<option value="${n}" ${String(n) === pseVal ? 'selected' : ''}>${n}</option>`).join('');
     return `
@@ -225,24 +269,29 @@ function renderPlan() {
 
   wrap.querySelectorAll('input[type=checkbox]').forEach(cb => {
     cb.addEventListener('change', e => {
-      localStorage.setItem(`plan_${e.target.dataset.date}_${e.target.dataset.slot}`, e.target.checked ? '1' : '0');
+      planState.checkboxes[`${e.target.dataset.date}_${e.target.dataset.slot}`] = e.target.checked;
+      syncToRemote();
       renderPlan();
     });
   });
   wrap.querySelectorAll('.pse-select').forEach(sel => {
     sel.addEventListener('change', e => {
-      localStorage.setItem(`plan_${e.target.dataset.date}_pse`, e.target.value);
+      planState.pse[e.target.dataset.date] = e.target.value;
+      syncToRemote();
     });
   });
   wrap.querySelectorAll('.notas-input').forEach(inp => {
     inp.addEventListener('change', e => {
-      localStorage.setItem(`plan_${e.target.dataset.date}_notas`, e.target.value);
+      planState.notas[e.target.dataset.date] = e.target.value;
+      syncToRemote();
     });
   });
 }
 
-function initDashboard() {
+async function initDashboard() {
+  loadLocalCache();
   renderPlan();
+  syncFromRemote().then(ok => { if (ok) renderPlan(); });
 
   // summary cards (7 dias)
   const s7 = DATA.summary_7;
