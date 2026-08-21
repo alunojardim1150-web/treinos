@@ -8,14 +8,14 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap');
   :root {
-    --bg: #12140d;
-    --card: #1b1f15;
-    --ink: #e9e4d3;
-    --muted: #8f9581;
-    --border: #333a27;
-    --accent: #7a9b3f;
-    --steel: #5c88ad;
-    --khaki: #b39b5e;
+    --bg: #0a1420;
+    --card: #111f2e;
+    --ink: #dce6ef;
+    --muted: #7d93a6;
+    --border: #1f3347;
+    --accent: #2f7fb0;
+    --steel: #5e7686;
+    --khaki: #c9a227;
     --amber: #d98a3d;
     --danger: #e2574c;
   }
@@ -32,7 +32,7 @@
   }
   h1 { font-family: 'Black Ops One', sans-serif; font-size: 1.35rem; margin: 6px 0 2px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--khaki); }
   .sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .quote-banner { background: linear-gradient(135deg, #1b1f15, #232a19); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; }
+  .quote-banner { background: linear-gradient(135deg, #111f2e, #16273a); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; }
   .quote-banner .qtext { font-size: 0.9rem; color: var(--ink); font-style: italic; line-height: 1.45; }
   .quote-banner .qauthor { margin-top: 8px; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
   .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
@@ -47,9 +47,9 @@
   th, td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em; }
   .pill { display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
-  .pill-Run { background: rgba(122,155,63,0.18); color: var(--accent); }
-  .pill-Swim { background: rgba(92,136,173,0.18); color: var(--steel); }
-  .pill-Workout { background: rgba(179,155,94,0.18); color: var(--khaki); }
+  .pill-Run { background: rgba(94,118,134,0.18); color: var(--steel); }
+  .pill-Swim { background: rgba(47,127,176,0.18); color: var(--accent); }
+  .pill-Workout { background: rgba(201,162,39,0.18); color: var(--khaki); }
   footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 34px; text-transform: uppercase; letter-spacing: 0.03em; }
 
   .plan-progress { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
@@ -70,7 +70,7 @@
 
   #gate {
     position: fixed; inset: 0; z-index: 999;
-    background: linear-gradient(160deg, #0d0f0a 0%, #1f2617 100%);
+    background: linear-gradient(160deg, #060b12 0%, #142438 100%);
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
   }
@@ -80,7 +80,7 @@
   #gate p { color: var(--muted); font-size: 0.85rem; margin: 0 0 18px; text-transform: uppercase; letter-spacing: 0.03em; }
   #gate input { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); color: var(--ink); font-family: 'Share Tech Mono', monospace; font-size: 1rem; text-align: center; letter-spacing: 0.15em; outline: none; }
   #gate input:focus { border-color: var(--accent); }
-  #gate button { width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 8px; border: none; background: var(--accent); color: #12140d; font-family: 'Black Ops One', sans-serif; font-size: 0.9rem; letter-spacing: 0.03em; text-transform: uppercase; cursor: pointer; }
+  #gate button { width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 8px; border: none; background: var(--accent); color: #0a1420; font-family: 'Black Ops One', sans-serif; font-size: 0.9rem; letter-spacing: 0.03em; text-transform: uppercase; cursor: pointer; }
   #gate button:active { transform: scale(0.98); }
   #gate .err { color: var(--danger); font-size: 0.8rem; margin-top: 10px; min-height: 1em; }
   #gate.shake .box { animation: shake 0.35s; }
@@ -92,8 +92,8 @@
 
 <div id="gate">
   <div class="box">
-    <div class="lock">🪖</div>
-    <h2>Identifique-se, soldado</h2>
+    <div class="lock">⚓</div>
+    <h2>Identifique-se, guerreiro</h2>
     <p>Digite o seu NIP</p>
     <input type="password" id="pwInput" inputmode="numeric" autocomplete="off" placeholder="••••••••" maxlength="20">
     <button id="pwBtn">Autorizar acesso</button>
@@ -102,7 +102,7 @@
 </div>
 
 <div id="app">
-  <h1>🎖️ Operação Híbrida</h1>
+  <h1>⚓ Operação Híbrida</h1>
   <div class="sub">Hugo · atualizado em 19/08/2026 · direto do Strava</div>
   <div class="quote-banner" id="quoteBanner"></div>
 
@@ -174,7 +174,7 @@ async function tryUnlock() {
     unlockApp();
   } else {
     const gate = document.getElementById('gate');
-    document.getElementById('pwErr').textContent = 'NIP incorreto. Tente novamente, soldado.';
+    document.getElementById('pwErr').textContent = 'NIP incorreto. Tente novamente, guerreiro.';
     gate.classList.remove('shake'); void gate.offsetWidth; gate.classList.add('shake');
   }
 }
@@ -200,7 +200,7 @@ const QUOTES = [
   {text: "Disciplina é escolher entre o que você quer agora e o que você quer de verdade.", author: "Código do Guerreiro"},
   {text: "A dor é temporária. Desistir dura para sempre.", author: "Doutrina de Combate"},
   {text: "Não é o crítico que conta, é quem está na arena, coberto de suor e poeira.", author: "Theodore Roosevelt"},
-  {text: "Levante-se, soldado. A missão não se cumpre sozinha.", author: "Doutrina de Combate"},
+  {text: "Levante-se, guerreiro. A missão não se cumpre sozinha.", author: "Doutrina de Combate"},
   {text: "Toda vantagem foi antes um treino que ninguém viu.", author: "Código do Guerreiro"},
   {text: "Não temas a lentidão, teme apenas parar.", author: "Provérbio Chinês"},
   {text: "Vencer não vale nada sem a vontade de se preparar.", author: "Código do Guerreiro"},
@@ -361,15 +361,15 @@ async function initDashboard() {
     data: {
       labels: DATA.week_labels,
       datasets: [
-        {label: 'Corrida', data: DATA.weekly_volume.Run, backgroundColor: '#7a9b3f', borderRadius: 4},
-        {label: 'Natação', data: DATA.weekly_volume.Swim, backgroundColor: '#5c88ad', borderRadius: 4},
-        {label: 'Workout', data: DATA.weekly_volume.Workout, backgroundColor: '#b39b5e', borderRadius: 4}
+        {label: 'Corrida', data: DATA.weekly_volume.Run, backgroundColor: '#5e7686', borderRadius: 4},
+        {label: 'Natação', data: DATA.weekly_volume.Swim, backgroundColor: '#2f7fb0', borderRadius: 4},
+        {label: 'Workout', data: DATA.weekly_volume.Workout, backgroundColor: '#c9a227', borderRadius: 4}
       ]
     },
     options: {
       responsive: true,
-      scales: { x: { stacked: true, ticks:{color:'#8f9581'}, grid:{display:false} }, y: { stacked: true, ticks:{color:'#8f9581'}, grid:{color:'#333a27'} } },
-      plugins: { legend: { labels: { color: '#e9e4d3' } } }
+      scales: { x: { stacked: true, ticks:{color:'#7d93a6'}, grid:{display:false} }, y: { stacked: true, ticks:{color:'#7d93a6'}, grid:{color:'#1f3347'} } },
+      plugins: { legend: { labels: { color: '#dce6ef' } } }
     }
   });
 
@@ -380,12 +380,12 @@ async function initDashboard() {
     type: 'line',
     data: {
       labels: paceLabels,
-      datasets: [{ label: 'Ritmo (min/km)', data: paceValues, borderColor: '#7a9b3f', backgroundColor: 'rgba(122,155,63,0.15)', tension: 0.3, pointRadius: 2, pointBackgroundColor: '#7a9b3f' }]
+      datasets: [{ label: 'Ritmo (min/km)', data: paceValues, borderColor: '#5e7686', backgroundColor: 'rgba(94,118,134,0.18)', tension: 0.3, pointRadius: 2, pointBackgroundColor: '#5e7686' }]
     },
     options: {
       responsive: true,
-      scales: { y: { reverse: true, ticks:{color:'#8f9581'}, grid:{color:'#333a27'} }, x: { ticks:{color:'#8f9581', maxTicksLimit: 10}, grid:{display:false} } },
-      plugins: { legend: { labels: { color: '#e9e4d3' } } }
+      scales: { y: { reverse: true, ticks:{color:'#7d93a6'}, grid:{color:'#1f3347'} }, x: { ticks:{color:'#7d93a6', maxTicksLimit: 10}, grid:{display:false} } },
+      plugins: { legend: { labels: { color: '#dce6ef' } } }
     }
   });
 
@@ -398,8 +398,8 @@ async function initDashboard() {
     },
     options: {
       responsive: true,
-      scales: { y: { ticks:{color:'#8f9581'}, grid:{color:'#333a27'} }, x: { ticks:{color:'#8f9581', maxTicksLimit: 10}, grid:{display:false} } },
-      plugins: { legend: { labels: { color: '#e9e4d3' } } }
+      scales: { y: { ticks:{color:'#7d93a6'}, grid:{color:'#1f3347'} }, x: { ticks:{color:'#7d93a6', maxTicksLimit: 10}, grid:{display:false} } },
+      plugins: { legend: { labels: { color: '#dce6ef' } } }
     }
   });
 
