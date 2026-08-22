@@ -37,6 +37,8 @@
   .quote-banner { background: linear-gradient(135deg, #111f2e, #16273a); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; }
   .quote-banner .qtext { font-size: 0.9rem; color: var(--ink); font-style: italic; line-height: 1.45; }
   .quote-banner .qauthor { margin-top: 8px; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+  .hard-quote { background: linear-gradient(135deg, #1c0e0e, #2a1210); border: 1px solid var(--danger); border-left: 4px solid var(--danger); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; text-align: center; }
+  .hard-quote .htext { font-family: 'Black Ops One', sans-serif; font-size: 0.82rem; color: #f2c9c4; text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.5; }
   .today-mission-card { background: var(--card); border: 2px solid var(--khaki); border-radius: 10px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 14px rgba(0,0,0,0.4); }
   .today-mission-label { background: var(--khaki); color: #0a1420; font-family: 'Black Ops One', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; padding: 7px 14px; }
   .today-mission-card.empty { border: 1px dashed var(--border); padding: 14px 16px; color: var(--muted); font-size: 0.85rem; }
@@ -116,6 +118,8 @@
   <h1>⚓ Operação Híbrida</h1>
   <div class="sub">Hugo · atualizado em 19/08/2026 · direto do Strava</div>
   <div class="quote-banner" id="quoteBanner"></div>
+  <div class="hard-quote" id="hardQuoteBanner"></div>
+  <div id="rankBadge"></div>
 
   <div id="todayMission"></div>
 
@@ -123,7 +127,6 @@
 
   <section>
     <h2>🎖️ Ordem de Missão (bloco 21/08–04/09)</h2>
-    <div id="rankBadge"></div>
     <div id="planProgress" class="plan-progress"></div>
     <div id="planCards"></div>
   </section>
@@ -211,11 +214,11 @@ const QUOTES = [
   {text: "Primeiro decida quem você quer ser. Depois faça o que precisa ser feito.", author: "Epicteto"},
   {text: "O obstáculo no caminho torna-se o caminho.", author: "Marco Aurélio"},
   {text: "Sofremos mais na imaginação do que na realidade.", author: "Sêneca"},
-  {text: "Não exija que os fatos aconteçam como você quer; deseje que aconteçam como acontecem, e terá paz.", author: "Epicteto"},
+  {text: "Não exija que os fatos se dobrem à sua vontade; deseje que sigam seu curso, e você terá paz.", author: "Epicteto"},
   {text: "Perdemos a vida em pequenos pedaços enquanto adiamos viver de verdade.", author: "Sêneca"},
   {text: "A queixa é o começo da derrota.", author: "Código do Guerreiro"},
   {text: "Com o escudo, ou sobre ele.", author: "Provérbio Espartano"},
-  {text: "Que suas ações falem, não suas palavras.", author: "Provérbio Espartano"},
+  {text: "Palavra sem ação é só ruído.", author: "Provérbio Espartano"},
   {text: "Conheça o inimigo e conheça a si mesmo; em cem batalhas, cem vitórias.", author: "Sun Tzu"},
   {text: "A oportunidade surge quando se cria uma desordem no adversário.", author: "Sun Tzu"},
   {text: "O corpo atinge o que a mente acredita.", author: "Doutrina de Combate"},
@@ -225,10 +228,10 @@ const QUOTES = [
   {text: "Levante-se, guerreiro. A missão não se cumpre sozinha.", author: "Doutrina de Combate"},
   {text: "Toda vantagem foi antes um treino que ninguém viu.", author: "Código do Guerreiro"},
   {text: "Não temas a lentidão, teme apenas parar.", author: "Provérbio Chinês"},
-  {text: "Vencer não vale nada sem a vontade de se preparar.", author: "Código do Guerreiro"},
+  {text: "Vencer sem preparo não vale nada.", author: "Código do Guerreiro"},
   {text: "No treino, sangre. Na missão, vença.", author: "Doutrina de Combate"},
   {text: "Um homem que conquistou seus medos é verdadeiramente livre.", author: "Epicteto"},
-  {text: "É difícil dominar a arte de viver bem; para isso é preciso estudar a vida inteira.", author: "Sêneca"},
+  {text: "Repita até doer. Repita até virar instinto.", author: "Doutrina de Combate"},
   {text: "Concentre-se no que está sob seu controle, deixe o resto seguir seu curso.", author: "Epicteto"},
   {text: "Cada amanhecer é uma nova missão; cada obstáculo, um teste de caráter.", author: "Doutrina de Combate"},
   {text: "Suor economizado em treino é sangue poupado em combate.", author: "Ditado Militar"},
@@ -236,6 +239,34 @@ const QUOTES = [
   {text: "A calma é uma vantagem tática.", author: "Doutrina de Combate"},
   {text: "O guerreiro não nasce pronto; ele se forja repetição após repetição.", author: "Código do Guerreiro"},
   {text: "Domine o corpo, e a mente seguirá.", author: "Bushido"},
+  {text: "Vontade fraca produz desculpa. Vontade forte produz resultado.", author: "Mentalidade de Operador"},
+  {text: "Ninguém lembra do dia que você quase desistiu — só do dia que você não desistiu.", author: "Doutrina de Combate"},
+];
+
+const TOUGH_QUOTES = [
+  "Deixa de corpo mole e vai vencer.",
+  "Preguiça não paga conta, treino sim.",
+  "Ninguém vai treinar por você — levanta e vai.",
+  "Desculpa não constrói corpo, nem resultado.",
+  "Ou você treina hoje, ou explica amanhã por que não treinou.",
+  "Cansado é estado. Fraco é escolha. Escolha certo.",
+  "O sofá não vai te fazer mais forte.",
+  "Se não dói um pouco, não conta.",
+  "Foco, suor e sem drama.",
+  "Guerreiro não negocia com preguiça.",
+  "Faz o trabalho. A desculpa fica pra depois.",
+  "Hoje não é dia de moleza.",
+  "Corpo mole hoje é derrota amanhã.",
+  "Ninguém te deve motivação — você que cria a sua.",
+  "Sem atalho. Só repetição.",
+  "A missão não espera sua vontade bater.",
+  "Vai doer. Vai valer a pena.",
+  "Se for fácil, não é treino, é passeio.",
+  "Chega de conversa — bota a bota e vai.",
+  "Hoje você decide: evolução ou desculpa.",
+  "Ninguém constrói disciplina deitado.",
+  "Encara o treino como encara o inimigo: sem hesitar.",
+  "Levanta. A vitória não bate na sua porta.",
 ];
 
 function dayOfYear(d) {
@@ -247,6 +278,11 @@ function renderQuote() {
   const q = QUOTES[dayOfYear(new Date()) % QUOTES.length];
   document.getElementById('quoteBanner').innerHTML =
     `<div class="qtext">"${q.text}"</div><div class="qauthor">— ${q.author}</div>`;
+}
+
+function renderHardQuote() {
+  const q = TOUGH_QUOTES[dayOfYear(new Date()) % TOUGH_QUOTES.length];
+  document.getElementById('hardQuoteBanner').innerHTML = `<div class="htext">${q}</div>`;
 }
 
 function fmtMin(min) {
@@ -477,6 +513,7 @@ function renderPlan() {
 
 async function initDashboard() {
   renderQuote();
+  renderHardQuote();
   loadLocalCache();
   renderPlan();
   syncFromRemote().then(ok => { if (ok) renderPlan(); });
