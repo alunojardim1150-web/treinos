@@ -37,6 +37,9 @@
   .quote-banner { background: linear-gradient(135deg, #111f2e, #16273a); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; }
   .quote-banner .qtext { font-size: 0.9rem; color: var(--ink); font-style: italic; line-height: 1.45; }
   .quote-banner .qauthor { margin-top: 8px; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+  .today-mission-card { background: var(--card); border: 2px solid var(--khaki); border-radius: 10px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 14px rgba(0,0,0,0.4); }
+  .today-mission-label { background: var(--khaki); color: #0a1420; font-family: 'Black Ops One', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; padding: 7px 14px; }
+  .today-mission-card.empty { border: 1px dashed var(--border); padding: 14px 16px; color: var(--muted); font-size: 0.85rem; }
   .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
   .card .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
@@ -107,6 +110,8 @@
   <h1>⚓ Operação Híbrida</h1>
   <div class="sub">Hugo · atualizado em 19/08/2026 · direto do Strava</div>
   <div class="quote-banner" id="quoteBanner"></div>
+
+  <div id="todayMission"></div>
 
   <div class="cards" id="summaryCards"></div>
 
@@ -277,6 +282,50 @@ function syncToRemote() {
   }, 500);
 }
 
+function todayISODate() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function renderTodayMission() {
+  const wrap = document.getElementById('todayMission');
+  if (!wrap) return;
+  const today = todayISODate();
+  const d = (DATA.plan || []).find(p => p.date_iso === today);
+  if (!d) {
+    wrap.innerHTML = `<div class="today-mission-card empty">📌 Sem missão agendada para hoje no bloco atual.</div>`;
+    return;
+  }
+  const amChecked = !!planState.checkboxes[`${d.date_iso}_am`];
+  const pmChecked = !!planState.checkboxes[`${d.date_iso}_pm`];
+  wrap.innerHTML = `
+  <div class="today-mission-card">
+    <div class="today-mission-label">📌 MISSÃO DE HOJE</div>
+    <div class="plan-banner" style="background:${d.color}">${d.icon} ${d.date} ${d.weekday} — ${d.label}</div>
+    <div class="plan-row warm">🔸 Aquecimento (manhã): ${d.warm_am}</div>
+    <div class="plan-row sess ${amChecked ? 'done' : ''}">
+      <label class="check"><input type="checkbox" ${amChecked ? 'checked' : ''} data-date="${d.date_iso}" data-slot="am" class="today-check"> <strong>Manhã — ${d.sess_am_title}</strong></label>
+      <div class="plan-desc">${d.sess_am}</div>
+    </div>
+    <div class="plan-row warm">🔸 Aquecimento (tarde): ${d.warm_pm}</div>
+    <div class="plan-row sess ${pmChecked ? 'done' : ''}">
+      <label class="check"><input type="checkbox" ${pmChecked ? 'checked' : ''} data-date="${d.date_iso}" data-slot="pm" class="today-check"> <strong>Tarde — ${d.sess_pm_title}</strong></label>
+      <div class="plan-desc">${d.sess_pm}</div>
+    </div>
+    <div class="plan-meta">🎯 Objetivo da missão: ${d.meta}</div>
+  </div>`;
+  wrap.querySelectorAll('.today-check').forEach(cb => {
+    cb.addEventListener('change', e => {
+      planState.checkboxes[`${e.target.dataset.date}_${e.target.dataset.slot}`] = e.target.checked;
+      syncToRemote();
+      renderPlan();
+    });
+  });
+}
+
 function renderPlan() {
   const wrap = document.getElementById('planCards');
   if (!DATA.plan || !DATA.plan.length) { wrap.innerHTML = ''; return; }
@@ -337,6 +386,8 @@ function renderPlan() {
       syncToRemote();
     });
   });
+
+  renderTodayMission();
 }
 
 async function initDashboard() {
