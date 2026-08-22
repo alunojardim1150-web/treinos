@@ -65,6 +65,8 @@
   .rank-badge .rank-next { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
   .rank-badge.max { border-color: #ffd766; }
   .rank-badge.max .rank-name { color: #ffd766; }
+  .rank-badge.barrigudo { border-color: var(--danger); background: linear-gradient(135deg, #1c0e0e, #2a1210); }
+  .rank-badge.barrigudo .rank-name { color: #f2a09a; }
   .plan-progress { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
   .plan-progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 5px; }
   .plan-progress-fill { height: 100%; background: var(--accent); transition: width 0.2s; }
@@ -334,14 +336,22 @@ function syncToRemote() {
 }
 
 const RANKS = [
-  { min: 0,   name: 'Grumete',              icon: '🪖' },
-  { min: 10,  name: 'Marinheiro',            icon: '⚓' },
-  { min: 25,  name: 'Cabo',                  icon: '🎖️' },
-  { min: 40,  name: 'Terceiro-Sargento',     icon: '🎖️' },
-  { min: 55,  name: 'Segundo-Sargento',      icon: '🎖️' },
-  { min: 70,  name: 'Suboficial',            icon: '🎖️' },
-  { min: 85,  name: 'Guarda-Marinha',        icon: '🏅' },
-  { min: 100, name: 'Comandante da Operação',icon: '🏆' }
+  { min: 0,  name: 'Marinheiro', icon: '⚓' },
+  { min: 25, name: 'Sargento',   icon: '🎖️' },
+  { min: 50, name: 'Subão',      icon: '🎖️' },
+  { min: 75, name: 'Tenente',    icon: '🏅' },
+  { min: 90, name: 'Comandante', icon: '🏆' }
+];
+
+const BARRIGUDO_TITLES = [
+  'Marinheiro de Sofá',
+  'Almirante da Preguiça',
+  'Capitão Barriga-Cheia',
+  'Sargento Pantufa',
+  'Comandante do Controle Remoto',
+  'Recruta da Rede (de Dormir)',
+  'Suboficial do Delivery',
+  'Tenente do Travesseiro',
 ];
 
 function getRankInfo(pct) {
@@ -357,6 +367,15 @@ function getRankInfo(pct) {
 function renderRankBadge(pct) {
   const el = document.getElementById('rankBadge');
   if (!el) return;
+
+  const weeklySessions = (DATA.summary_7 && DATA.summary_7.total_sessions) || 0;
+  if (weeklySessions === 0) {
+    const titulo = BARRIGUDO_TITLES[dayOfYear(new Date()) % BARRIGUDO_TITLES.length];
+    el.className = 'rank-badge barrigudo';
+    el.innerHTML = `<span class="rank-icon">🍔</span><div><div class="rank-name">${titulo}</div><div class="rank-next">Zero treino essa semana... a patente entrou de férias. Bora reverter isso.</div></div>`;
+    return;
+  }
+
   const { current, next } = getRankInfo(pct);
   if (next) {
     const falta = Math.max(0, next.min - pct);
