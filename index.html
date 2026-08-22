@@ -122,6 +122,14 @@
   </section>
 
   <section>
+    <h2>📈 Evolução da PSE (percepção de esforço)</h2>
+    <div class="chart-wrap">
+      <canvas id="pseChart" height="180"></canvas>
+      <div id="pseChartEmpty" style="display:none; color: var(--muted); font-size:0.85rem; padding: 10px 0;">Sem registros de PSE ainda — preencha o campo PSE nas sessões do plano.</div>
+    </div>
+  </section>
+
+  <section>
     <h2>📊 Relatório de Volume Semanal (km)</h2>
     <div class="chart-wrap"><canvas id="volumeChart" height="200"></canvas></div>
   </section>
@@ -282,6 +290,39 @@ function syncToRemote() {
   }, 500);
 }
 
+let pseChartInstance = null;
+function renderPseChart() {
+  const canvas = document.getElementById('pseChart');
+  const emptyMsg = document.getElementById('pseChartEmpty');
+  if (!canvas || typeof Chart === 'undefined') return;
+  const entries = Object.keys(planState.pse)
+    .filter(k => planState.pse[k])
+    .sort()
+    .map(k => ({ date: k, pse: Number(planState.pse[k]) }));
+  if (pseChartInstance) { pseChartInstance.destroy(); pseChartInstance = null; }
+  if (!entries.length) {
+    canvas.style.display = 'none';
+    if (emptyMsg) emptyMsg.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  if (emptyMsg) emptyMsg.style.display = 'none';
+  const labels = entries.map(e => { const [y, m, d] = e.date.split('-'); return `${d}/${m}`; });
+  const values = entries.map(e => e.pse);
+  pseChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{ label: 'PSE (1-10)', data: values, borderColor: '#d98a3d', backgroundColor: 'rgba(217,138,61,0.18)', tension: 0.3, fill: true, pointRadius: 3, pointBackgroundColor: '#d98a3d' }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { min: 0, max: 10, ticks: { color: '#7d93a6', stepSize: 2 }, grid: { color: '#1f3347' } }, x: { ticks: { color: '#7d93a6', maxTicksLimit: 10 }, grid: { display: false } } },
+      plugins: { legend: { labels: { color: '#dce6ef' } } }
+    }
+  });
+}
+
 function todayISODate() {
   const d = new Date();
   const yyyy = d.getFullYear();
@@ -388,6 +429,7 @@ function renderPlan() {
   });
 
   renderTodayMission();
+  renderPseChart();
 }
 
 async function initDashboard() {
