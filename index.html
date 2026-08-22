@@ -57,6 +57,12 @@
   .pill-Workout { background: rgba(201,162,39,0.18); color: var(--khaki); }
   footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 34px; text-transform: uppercase; letter-spacing: 0.03em; }
 
+  .rank-badge { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #111f2e, #16273a); border: 2px solid var(--khaki); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+  .rank-badge .rank-icon { font-size: 2.1rem; line-height: 1; }
+  .rank-badge .rank-name { font-family: 'Black Ops One', sans-serif; font-size: 1rem; color: var(--khaki); letter-spacing: 0.02em; }
+  .rank-badge .rank-next { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+  .rank-badge.max { border-color: #ffd766; }
+  .rank-badge.max .rank-name { color: #ffd766; }
   .plan-progress { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
   .plan-progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 5px; }
   .plan-progress-fill { height: 100%; background: var(--accent); transition: width 0.2s; }
@@ -117,6 +123,7 @@
 
   <section>
     <h2>🎖️ Ordem de Missão (bloco 21/08–04/09)</h2>
+    <div id="rankBadge"></div>
     <div id="planProgress" class="plan-progress"></div>
     <div id="planCards"></div>
   </section>
@@ -290,6 +297,41 @@ function syncToRemote() {
   }, 500);
 }
 
+const RANKS = [
+  { min: 0,   name: 'Grumete',              icon: '🪖' },
+  { min: 10,  name: 'Marinheiro',            icon: '⚓' },
+  { min: 25,  name: 'Cabo',                  icon: '🎖️' },
+  { min: 40,  name: 'Terceiro-Sargento',     icon: '🎖️' },
+  { min: 55,  name: 'Segundo-Sargento',      icon: '🎖️' },
+  { min: 70,  name: 'Suboficial',            icon: '🎖️' },
+  { min: 85,  name: 'Guarda-Marinha',        icon: '🏅' },
+  { min: 100, name: 'Comandante da Operação',icon: '🏆' }
+];
+
+function getRankInfo(pct) {
+  let current = RANKS[0];
+  let next = null;
+  for (let i = 0; i < RANKS.length; i++) {
+    if (pct >= RANKS[i].min) current = RANKS[i];
+    else { next = RANKS[i]; break; }
+  }
+  return { current, next };
+}
+
+function renderRankBadge(pct) {
+  const el = document.getElementById('rankBadge');
+  if (!el) return;
+  const { current, next } = getRankInfo(pct);
+  if (next) {
+    const falta = Math.max(0, next.min - pct);
+    el.className = 'rank-badge';
+    el.innerHTML = `<span class="rank-icon">${current.icon}</span><div><div class="rank-name">${current.name}</div><div class="rank-next">Faltam ${falta}% da missão pra virar ${next.name}</div></div>`;
+  } else {
+    el.className = 'rank-badge max';
+    el.innerHTML = `<span class="rank-icon">${current.icon}</span><div><div class="rank-name">${current.name}</div><div class="rank-next">Patente máxima da operação — missão cumprida!</div></div>`;
+  }
+}
+
 let pseChartInstance = null;
 function renderPseChart() {
   const canvas = document.getElementById('pseChart');
@@ -407,6 +449,7 @@ function renderPlan() {
   const pct = total ? Math.round((doneCount / total) * 100) : 0;
   document.getElementById('planProgress').innerHTML =
     `${doneCount}/${total} sessões concluídas<div class="plan-progress-bar"><div class="plan-progress-fill" style="width:${pct}%"></div></div>`;
+  renderRankBadge(pct);
 
   wrap.querySelectorAll('input[type=checkbox]').forEach(cb => {
     cb.addEventListener('change', e => {
