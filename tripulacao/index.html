@@ -25,7 +25,14 @@
   body{
     margin:0;
     font-family:'Share Tech Mono','Courier New',monospace;
-    background:var(--bg);
+    background-color:var(--bg);
+    background-image:
+      linear-gradient(rgba(94,118,134,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(94,118,134,.05) 1px, transparent 1px),
+      linear-gradient(rgba(94,118,134,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(94,118,134,.035) 1px, transparent 1px);
+    background-size:28px 28px, 28px 28px, 140px 140px, 140px 140px;
+    background-attachment:fixed;
     color:var(--ink);
     line-height:1.55;
   }
