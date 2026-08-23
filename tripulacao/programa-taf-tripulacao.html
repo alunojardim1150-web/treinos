@@ -324,6 +324,14 @@
   .admin-log-table{width:100%;border-collapse:collapse;font-size:.74rem;}
   .admin-log-table th,.admin-log-table td{padding:6px 4px;border-bottom:1px solid var(--border);text-align:left;}
   .admin-log-table th{color:var(--muted);text-transform:uppercase;font-size:.62rem;}
+  .admin-subtitulo{
+    color:var(--khaki);
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin:20px 0 8px;
+  }
+  .admin-subtitulo:first-of-type{margin-top:0;}
 
   nav.tabs{
     display:flex;
@@ -795,27 +803,97 @@ const NIPS_AUTORIZADOS_HASH = ["efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d
 const ADMIN_NIP_HASH = "efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696";
 const ACCESS_BIN_ID = "6a8a48b9f5f4af5e2936ffac";
 const ACCESS_BIN_KEY = "$2a$10$DFLtfigVrve9XJbArlXkMO7Z4nQA2eQ/i2BCADya8z81YKS7Vx80S";
+let nipAtual = null;
 
 async function sha256Hex(texto){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function registrarAcesso(nip){
-  if (!ACCESS_BIN_ID) return;
+// ---------- helpers de sync no bin (acessos + progresso, mesmo documento) ----------
+async function fetchBin(){
+  if (!ACCESS_BIN_ID) return {acessos:[], progresso:{}};
   try {
     const r = await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID + '/latest', {
       headers: {'X-Access-Key': ACCESS_BIN_KEY}
     });
     const j = await r.json();
-    const acessos = (j.record && j.record.acessos) ? j.record.acessos : [];
-    acessos.push({nip, ts: new Date().toISOString()});
+    const rec = j.record || {};
+    return {acessos: rec.acessos || [], progresso: rec.progresso || {}};
+  } catch(e) {
+    return {acessos:[], progresso:{}};
+  }
+}
+
+async function putBin(rec){
+  if (!ACCESS_BIN_ID) return;
+  try {
     await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json', 'X-Access-Key': ACCESS_BIN_KEY},
-      body: JSON.stringify({acessos})
+      body: JSON.stringify(rec)
     });
   } catch(e) {}
+}
+
+async function registrarAcesso(nip){
+  if (!ACCESS_BIN_ID) return;
+  const rec = await fetchBin();
+  rec.acessos.push({nip, ts: new Date().toISOString()});
+  await putBin(rec);
+}
+
+// ---------- progresso sincronizado por NIP (checks + semana + nível) ----------
+async function hidratarProgresso(nip){
+  nipAtual = nip;
+  if (!ACCESS_BIN_ID) return;
+  const rec = await fetchBin();
+  const p = rec.progresso[nip];
+  if (!p) return;
+  if (p.nivel) nivel = p.nivel;
+  if (p.semanaLiberada) semanaLiberada = Math.min(Math.max(p.semanaLiberada, 1), TOTAL_SEMANAS);
+  if (p.semanaView) semanaView = Math.min(Math.max(p.semanaView, 1), semanaLiberada);
+  if (p.checks) checks = p.checks;
+  try {
+    if (nivel) localStorage.setItem('taf-nivel', nivel);
+    localStorage.setItem('taf-semana-liberada', String(semanaLiberada));
+    localStorage.setItem('taf-semana-view', String(semanaView));
+    localStorage.setItem('taf-checks', JSON.stringify(checks));
+  } catch(e) {}
+  if (nivel && NIVEL_NOME[nivel]) {
+    nivelAtualLabel.textContent = NIVEL_NOME[nivel];
+    setOnboardState('none');
+  }
+  renderSemanas();
+}
+
+let syncProgressoTimer = null;
+function agendarSyncProgresso(){
+  if (!ACCESS_BIN_ID || !nipAtual) return;
+  clearTimeout(syncProgressoTimer);
+  syncProgressoTimer = setTimeout(sincronizarProgresso, 600);
+}
+
+async function sincronizarProgresso(){
+  if (!ACCESS_BIN_ID || !nipAtual) return;
+  const rec = await fetchBin();
+  rec.progresso[nipAtual] = {
+    nivel, semanaLiberada, semanaView, checks,
+    atualizadoEm: new Date().toISOString()
+  };
+  await putBin(rec);
+}
+
+function pctProgresso(p){
+  let total = 0, done = 0;
+  const lib = p.semanaLiberada || 1;
+  for (let w = 1; w <= lib; w++){
+    const wk = WEEKS[w - 1];
+    if (!wk) continue;
+    total += wk.dias.length;
+    done += wk.dias.filter(d => p.checks && p.checks[w + '_' + d.dia]).length;
+  }
+  return total ? Math.round(done / total * 100) : 0;
 }
 
 const nipGate = document.getElementById('nipGate');
@@ -835,6 +913,7 @@ async function tentarEntrar(){
       document.getElementById('adminTabBtn').style.display = '';
     }
     registrarAcesso(nip);
+    hidratarProgresso(nip);
   } else {
     nipErro.textContent = 'NIP não autorizado. Confira com o responsável pelo programa.';
   }
@@ -844,7 +923,7 @@ document.getElementById('nipEntrarBtn').addEventListener('click', tentarEntrar);
 nipInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarEntrar(); });
 nipInput.focus();
 
-// ---------- admin: log de acessos (reconhecido automaticamente pelo NIP) ----------
+// ---------- admin: log de acessos + progresso (reconhecido automaticamente pelo NIP) ----------
 async function carregarLogAdmin(){
   const resumo = document.getElementById('adminResumo');
   const wrap = document.getElementById('adminLogWrap');
@@ -855,18 +934,29 @@ async function carregarLogAdmin(){
     return;
   }
   try {
-    const r = await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID + '/latest', {
-      headers: {'X-Access-Key': ACCESS_BIN_KEY}
-    });
-    const j = await r.json();
-    const acessos = (j.record && j.record.acessos) ? j.record.acessos : [];
+    const rec = await fetchBin();
+    const acessos = rec.acessos;
+    const progresso = rec.progresso;
     const nipsUnicos = new Set(acessos.map(a => a.nip));
     resumo.innerHTML = 'Total de acessos: <b>' + acessos.length + '</b> · NIPs distintos: <b>' + nipsUnicos.size + '</b>';
-    const linhas = acessos.slice().reverse().map(a => {
+
+    const linhasProgresso = Object.keys(progresso).map(nip => {
+      const p = progresso[nip];
+      const nivelTxt = p.nivel && NIVEL_NOME[p.nivel] ? NIVEL_NOME[p.nivel] : '—';
+      const atualizado = p.atualizadoEm ? new Date(p.atualizadoEm).toLocaleString('pt-BR') : '—';
+      return `<tr><td>${nip}</td><td>${nivelTxt}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td>${pctProgresso(p)}%</td><td>${atualizado}</td></tr>`;
+    }).join('');
+
+    const linhasAcesso = acessos.slice().reverse().map(a => {
       const data = new Date(a.ts);
       return `<tr><td>${a.nip}</td><td>${data.toLocaleString('pt-BR')}</td></tr>`;
     }).join('');
-    wrap.innerHTML = `<table class="admin-log-table"><tr><th>NIP</th><th>Data/hora</th></tr>${linhas}</table>`;
+
+    wrap.innerHTML =
+      '<h3 class="admin-subtitulo">Progresso por NIP</h3>' +
+      `<table class="admin-log-table"><tr><th>NIP</th><th>Nível</th><th>Semana</th><th>Concluído</th><th>Atualizado</th></tr>${linhasProgresso || '<tr><td colspan="5">Nenhum progresso sincronizado ainda.</td></tr>'}</table>` +
+      '<h3 class="admin-subtitulo">Histórico de acessos</h3>' +
+      `<table class="admin-log-table"><tr><th>NIP</th><th>Data/hora</th></tr>${linhasAcesso}</table>`;
   } catch(e) {
     resumo.textContent = 'Erro ao carregar o log de acessos.';
   }
@@ -962,6 +1052,7 @@ function definirNivel(n){
   nivelAtualLabel.textContent = NIVEL_NOME[n];
   setOnboardState('none');
   renderSemanas();
+  agendarSyncProgresso();
 }
 
 document.querySelectorAll('.nivel-opcao').forEach(op => {
@@ -1101,6 +1192,7 @@ function liberarProximaSemana(){
   salvarSemanaEstado();
   renderSemanas();
   window.scrollTo({top:0, behavior:'smooth'});
+  agendarSyncProgresso();
 }
 
 document.getElementById('semanaPrev').addEventListener('click', () => irParaSemana(semanaView - 1));
@@ -1183,6 +1275,7 @@ function renderSemanas(){
       checks[key] = e.target.checked;
       saveChecks();
       renderSemanas();
+      agendarSyncProgresso();
     });
   });
 }
