@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa TAF — Tripulação</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap');
+  :root{
+    --bg:#0a1420;
+    --card:#111f2e;
+    --ink:#dce6ef;
+    --muted:#7d93a6;
+    --border:#1f3347;
+    --accent:#2f7fb0;
+    --steel:#5e7686;
+    --khaki:#c9a227;
+    --amber:#d98a3d;
+    --danger:#e2574c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    font-family:'Share Tech Mono','Courier New',monospace;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  header{
+    padding:20px 20px 14px;
+    text-align:center;
+  }
+  header h1{
+    margin:0 0 4px;
+    font-family:'Black Ops One',sans-serif;
+    font-size:1.3rem;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    color:var(--khaki);
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  header p.lema{
+    color:var(--khaki);
+    font-weight:700;
+    font-size:.8rem;
+  }
+
+  /* ---- frase motivacional ---- */
+  .frase-dia{
+    max-width:680px;
+    margin:0 auto;
+    padding:2px 22px 14px;
+    text-align:center;
+  }
+  .frase-dia blockquote{
+    margin:0;
+    font-style:italic;
+    color:var(--ink);
+    font-size:.82rem;
+    line-height:1.5;
+  }
+  .frase-dia blockquote::before{content:"“";color:var(--khaki);}
+  .frase-dia blockquote::after{content:"”";color:var(--khaki);}
+  .frase-dia cite{
+    display:block;
+    margin-top:6px;
+    font-style:normal;
+    color:var(--khaki);
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+
+  /* ---- nível: pill compacto ---- */
+  .nivel-bar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:var(--card);
+    padding:9px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border-bottom:1px solid var(--border);
+    font-size:.76rem;
+  }
+  .nivel-bar .lbl{color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-size:.7rem;}
+  .nivel-bar b{color:var(--khaki);}
+  .nivel-bar button{
+    background:var(--bg);
+    color:var(--muted);
+    border:1px solid var(--border);
+    padding:4px 12px;
+    border-radius:14px;
+    font-family:inherit;
+    font-size:.7rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    cursor:pointer;
+  }
+
+  /* ---- onboarding de nível ---- */
+  .nivel-onboard{
+    max-width:720px;
+    margin:0 auto;
+    padding:16px 14px 4px;
+  }
+  .nivel-onboard h2{
+    font-family:'Black Ops One',sans-serif;
+    color:var(--khaki);
+    font-size:1rem;
+    text-transform:uppercase;
+    text-align:center;
+    margin:6px 0 4px;
+  }
+  .nivel-onboard>p{
+    text-align:center;
+    color:var(--muted);
+    font-size:.8rem;
+    margin:0 0 14px;
+  }
+  .nivel-opcao{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--steel);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    cursor:pointer;
+  }
+  .nivel-opcao:active{transform:scale(.99);}
+  .nivel-opcao h3{
+    margin:0 0 4px;
+    font-family:'Black Ops One',sans-serif;
+    font-size:.86rem;
+    text-transform:uppercase;
+    color:var(--ink);
+  }
+  .nivel-opcao p{margin:0;color:var(--muted);font-size:.78rem;}
+  .nivel-opcao.ini{border-left-color:#5e9c7a;}
+  .nivel-opcao.int{border-left-color:var(--accent);}
+  .nivel-opcao.adv{border-left-color:var(--khaki);}
+
+  /* ---- onboarding de teste (calculo automatico) ---- */
+  .teste-onboard{
+    max-width:720px;
+    margin:0 auto;
+    padding:16px 14px 4px;
+  }
+  .teste-onboard h2{
+    font-family:'Black Ops One',sans-serif;
+    color:var(--khaki);
+    font-size:1rem;
+    text-transform:uppercase;
+    text-align:center;
+    margin:6px 0 4px;
+  }
+  .teste-onboard>p{
+    text-align:center;
+    color:var(--muted);
+    font-size:.8rem;
+    margin:0 0 14px;
+  }
+  .campo{margin-bottom:12px;}
+  .campo label{
+    display:block;
+    color:var(--muted);
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    margin-bottom:5px;
+  }
+  .opcoes-inline{display:flex;gap:8px;}
+  .opcoes-inline .opt{
+    flex:1;
+    background:var(--card);
+    color:var(--muted);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px;
+    font-family:inherit;
+    font-size:.8rem;
+    cursor:pointer;
+  }
+  .opcoes-inline .opt.active{
+    background:var(--accent);
+    color:#eef4f9;
+    border-color:var(--accent);
+    font-weight:700;
+  }
+  .campo select{
+    width:100%;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px;
+    font-family:inherit;
+    font-size:.84rem;
+  }
+  .tempo-inputs{display:flex;align-items:center;gap:6px;}
+  .tempo-inputs input{
+    width:70px;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px;
+    font-family:inherit;
+    font-size:.9rem;
+    text-align:center;
+  }
+  .tempo-inputs span{color:var(--muted);}
+  .resultado-teste{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--khaki);
+    border-radius:10px;
+    padding:14px 16px;
+    margin:14px 0;
+  }
+  .resultado-linha{
+    display:flex;
+    justify-content:space-between;
+    font-size:.84rem;
+    padding:4px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .resultado-linha b{color:var(--ink);}
+  .resultado-nivel{
+    margin-top:8px;
+    text-align:center;
+    font-size:.86rem;
+    color:var(--muted);
+  }
+  .resultado-nivel b{color:var(--khaki);}
+  .pular-teste{
+    text-align:center;
+    font-size:.74rem;
+    margin:10px 0 4px;
+  }
+  .pular-teste a{color:var(--accent);text-decoration:underline;cursor:pointer;}
+
+  /* ---- gate de NIP ---- */
+  .nip-gate{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .nip-card{
+    max-width:360px;
+    width:100%;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--khaki);
+    border-radius:10px;
+    padding:24px 22px;
+    text-align:center;
+  }
+  .nip-card h2{
+    font-family:'Black Ops One',sans-serif;
+    color:var(--khaki);
+    font-size:1rem;
+    text-transform:uppercase;
+    margin:0 0 8px;
+  }
+  .nip-card p{
+    color:var(--muted);
+    font-size:.78rem;
+    margin:0 0 16px;
+  }
+  .nip-card input{
+    width:100%;
+    background:var(--bg);
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px;
+    font-family:inherit;
+    font-size:1rem;
+    text-align:center;
+    letter-spacing:.05em;
+    margin-bottom:12px;
+  }
+  .nip-card button{
+    width:100%;
+    background:var(--khaki);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    padding:12px 14px;
+    font-family:'Black Ops One',sans-serif;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    cursor:pointer;
+  }
+  .nip-erro{
+    color:var(--danger);
+    font-size:.76rem;
+    margin-top:10px;
+    min-height:1em;
+  }
+
+  /* ---- admin: gatilho escondido + modais ---- */
+  #adminTrigger{
+    text-align:center;
+    padding:4px 0 0;
+  }
+  #adminTrigger a{
+    color:var(--border);
+    font-size:.62rem;
+    text-decoration:none;
+  }
+  .admin-modal-bg{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:rgba(10,20,32,.9);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .admin-modal{
+    max-width:420px;
+    width:100%;
+    max-height:82vh;
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent);
+    border-radius:10px;
+    padding:22px;
+  }
+  .admin-modal h2{
+    font-family:'Black Ops One',sans-serif;
+    color:var(--khaki);
+    font-size:.92rem;
+    text-transform:uppercase;
+    margin:0 0 14px;
+    text-align:center;
+  }
+  .admin-modal input{
+    width:100%;
+    background:var(--bg);
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:11px;
+    font-family:inherit;
+    font-size:.9rem;
+    margin-bottom:10px;
+  }
+  .admin-modal button{
+    background:var(--accent);
+    color:#eef4f9;
+    border:none;
+    border-radius:8px;
+    padding:10px 16px;
+    font-family:'Black Ops One',sans-serif;
+    font-size:.72rem;
+    text-transform:uppercase;
+    cursor:pointer;
+    margin-right:8px;
+  }
+  .admin-modal button.fechar{background:var(--steel);}
+  .admin-resumo{
+    color:var(--muted);
+    font-size:.78rem;
+    margin-bottom:12px;
+  }
+  .admin-resumo b{color:var(--khaki);}
+  .admin-log-table{width:100%;border-collapse:collapse;font-size:.74rem;}
+  .admin-log-table th,.admin-log-table td{padding:6px 4px;border-bottom:1px solid var(--border);text-align:left;}
+  .admin-log-table th{color:var(--muted);text-transform:uppercase;font-size:.62rem;}
+
+  nav.tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:center;
+    padding:10px;
+    background:var(--bg);
+    position:sticky;
+    top:41px;
+    z-index:15;
+    border-bottom:1px solid var(--border);
+  }
+  nav.tabs button{
+    background:var(--card);
+    color:var(--muted);
+    border:1px solid var(--border);
+    padding:7px 14px;
+    border-radius:16px;
+    font-size:.76rem;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  nav.tabs button.active{
+    background:var(--accent);
+    color:#eef4f9;
+    border-color:var(--accent);
+    font-weight:700;
+  }
+
+  /* ---- seletor de semana ---- */
+  .semana-bar{
+    position:sticky;
+    top:88px;
+    z-index:14;
+    background:var(--bg);
+    padding:10px 10px 6px;
+    border-bottom:1px solid var(--border);
+  }
+  .semana-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .semana-nav button.step{
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--khaki);
+    width:30px;height:30px;
+    border-radius:50%;
+    font-size:.9rem;
+    cursor:pointer;
+  }
+  .semana-nav .titulo{
+    font-family:'Black Ops One',sans-serif;
+    color:var(--khaki);
+    font-size:.86rem;
+    text-transform:uppercase;
+    min-width:150px;
+    text-align:center;
+  }
+  .semana-pills{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:2px 4px 8px;
+    max-width:720px;
+    margin:0 auto;
+    scrollbar-width:thin;
+  }
+  .semana-pills button{
+    flex:0 0 auto;
+    background:var(--card);
+    color:var(--muted);
+    border:1px solid var(--border);
+    width:34px;height:34px;
+    border-radius:50%;
+    font-size:.74rem;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .semana-pills button.active{
+    background:var(--khaki);
+    color:var(--bg);
+    border-color:var(--khaki);
+    font-weight:700;
+  }
+  .semana-pills button.feito{box-shadow:inset 0 0 0 2px var(--accent);}
+  .semana-sub{
+    text-align:center;
+    color:var(--muted);
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    margin:-2px 0 2px;
+  }
+
+  .btn-avancar{
+    display:block;
+    width:100%;
+    margin:2px 0 14px;
+    background:var(--khaki);
+    color:var(--bg);
+    border:none;
+    border-radius:8px;
+    padding:12px 14px;
+    font-family:'Black Ops One',sans-serif;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    cursor:pointer;
+  }
+  .fim-badge{
+    text-align:center;
+    color:var(--khaki);
+    font-size:.78rem;
+    margin:2px 0 14px;
+  }
+
+  main{
+    max-width:720px;
+    margin:0 auto;
+    padding:14px 14px 50px;
+  }
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(0,0,0,.35);
+    border-left:4px solid var(--steel);
+  }
+  .card.gold{border-left-color:var(--khaki);box-shadow:0 2px 14px rgba(201,162,39,.15);}
+  .card h2{
+    margin-top:0;
+    font-family:'Black Ops One',sans-serif;
+    color:var(--khaki);
+    font-size:.95rem;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .card .progresso{
+    font-family:'Share Tech Mono',monospace;
+    color:var(--muted);
+    font-size:.7rem;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.84rem;
+    margin:8px 0;
+  }
+  th,td{
+    padding:7px 6px;
+    text-align:left;
+    vertical-align:top;
+    border-bottom:1px solid var(--border);
+  }
+  th{
+    color:var(--muted);
+    font-weight:600;
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .day-table td.day-name{
+    font-weight:700;
+    color:var(--khaki);
+    white-space:nowrap;
+  }
+  .day-table td.chk{width:30px;text-align:center;}
+  .day-table input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);cursor:pointer;}
+  tr.concluida td{opacity:.5;}
+  tr.simulado td{color:var(--danger);font-weight:700;}
+  .aquec{
+    color:var(--amber);
+    font-size:.72rem;
+    margin-bottom:3px;
+  }
+  .presc{color:var(--ink);}
+  .note{
+    background:rgba(217,138,61,.1);
+    border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+    border-radius:8px;
+    padding:9px 12px;
+    font-size:.78rem;
+    color:var(--amber);
+    margin:8px 0;
+  }
+  details{
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:10px;
+    overflow:hidden;
+    background:var(--card);
+  }
+  summary{
+    padding:11px 14px;
+    cursor:pointer;
+    font-weight:600;
+    color:var(--khaki);
+    background:rgba(255,255,255,.02);
+    font-size:.88rem;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";color:var(--khaki);}
+  details[open] summary::before{content:"▾ ";}
+  .details-body{padding:12px 14px;font-size:.84rem;color:var(--ink);}
+  ul{padding-left:20px;margin:6px 0;}
+  li{margin-bottom:4px;}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:.7rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:18px;
+  }
+  @media(max-width:600px){
+    table{font-size:.76rem;}
+    th,td{padding:6px 4px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="nip-gate" id="nipGate">
+  <div class="nip-card">
+    <h2>Acesso restrito</h2>
+    <p>Informe seu NIP para acessar o programa TAF da tripulação.</p>
+    <input type="text" id="nipInput" inputmode="numeric" placeholder="Seu NIP" maxlength="20" autocomplete="off">
+    <button type="button" id="nipEntrarBtn">Entrar</button>
+    <div class="nip-erro" id="nipErro"></div>
+  </div>
+</div>
+
+<div id="appContent" style="display:none;">
+
+<header>
+  <h1>PROGRAMA TAF - F45</h1>
+  <p class="lema">Nós somos a UNIÃO e a UNIÃO faz a força</p>
+</header>
+
+<div class="frase-dia" id="fraseDia"></div>
+
+<div class="nivel-bar" id="nivelBar" style="display:none;">
+  <span class="lbl">Nível:</span> <b id="nivelAtualLabel">—</b>
+  <button id="trocarNivelBtn">trocar</button>
+</div>
+
+<div class="teste-onboard" id="testeOnboard">
+  <h2>🎖️ Teste inicial do TAF</h2>
+  <p>Esse é o seu primeiro "treino": corra os 2.400 m e sustente a prancha isométrica, informe os tempos abaixo e o app calcula sua nota em cada prova e já te encaminha pro nível certo.</p>
+
+  <div class="campo">
+    <label>Sexo</label>
+    <div class="opcoes-inline" id="sexoOpcoes">
+      <button type="button" class="opt active" data-sexo="M">Masculino</button>
+      <button type="button" class="opt" data-sexo="F">Feminino</button>
+    </div>
+  </div>
+
+  <div class="campo">
+    <label for="faixaEtaria">Faixa etária</label>
+    <select id="faixaEtaria">
+      <option value="18-25">18 a 25 anos</option>
+      <option value="26-33">26 a 33 anos</option>
+      <option value="34-39">34 a 39 anos</option>
+      <option value="40-45">40 a 45 anos</option>
+      <option value="46-49">46 a 49 anos</option>
+      <option value="50+">50 anos ou mais</option>
+    </select>
+  </div>
+
+  <div class="campo">
+    <label>Corrida 2.400 m — tempo total</label>
+    <div class="tempo-inputs">
+      <input type="number" id="corridaMin" min="0" max="59" placeholder="min"> <span>:</span> <input type="number" id="corridaSeg" min="0" max="59" placeholder="seg">
+    </div>
+  </div>
+
+  <div class="campo">
+    <label>Prancha isométrica — tempo sustentado</label>
+    <div class="tempo-inputs">
+      <input type="number" id="pranchaMin" min="0" max="59" placeholder="min"> <span>:</span> <input type="number" id="pranchaSeg" min="0" max="59" placeholder="seg">
+    </div>
+  </div>
+
+  <button class="btn-avancar" id="calcularTesteBtn" type="button">Calcular nota e nível</button>
+
+  <div class="resultado-teste" id="resultadoTeste" style="display:none;">
+    <div class="resultado-linha"><span>Corrida 2.400 m</span><b id="notaCorridaOut">—</b></div>
+    <div class="resultado-linha"><span>Prancha isométrica</span><b id="notaPranchaOut">—</b></div>
+    <div class="resultado-nivel">Nível calculado: <b id="nivelCalculadoOut">—</b></div>
+    <button class="btn-avancar" id="confirmarNivelBtn" type="button">Começar meus treinos</button>
+  </div>
+
+  <p class="pular-teste"><a href="#" id="pularTesteLink">Ainda não fiz o teste — escolher nível manualmente</a></p>
+</div>
+
+<div class="nivel-onboard" id="nivelOnboard">
+  <h2>🎖️ Escolha seu nível manualmente</h2>
+  <p>Baseie-se no seu último teste de corrida 2.400 m e prancha isométrica (tabela completa na aba Sobre).</p>
+  <div class="nivel-opcao ini" data-nivel="ini">
+    <h3>Iniciante</h3>
+    <p>Nota abaixo de 5 em algum dos testes, ou parado há tempo. Volumes ~70% do padrão, variações mais simples de exercício.</p>
+  </div>
+  <div class="nivel-opcao int" data-nivel="int">
+    <h3>Intermediário</h3>
+    <p>Nota entre 5 e 7 na maioria dos testes. Volumes no padrão do programa.</p>
+  </div>
+  <div class="nivel-opcao adv" data-nivel="adv">
+    <h3>Avançado</h3>
+    <p>Nota 7 ou mais na maioria dos testes. Volumes ~130% do padrão, exercícios com variações mais exigentes.</p>
+  </div>
+  <p class="pular-teste"><a href="#" id="voltarTesteLink">‹ Prefiro fazer o teste automático</a></p>
+</div>
+
+<nav class="tabs" id="mainTabs">
+  <button data-tab="treinos" class="active">Treinos</button>
+  <button data-tab="sobre">Sobre</button>
+</nav>
+
+<main>
+
+<!-- TREINOS -->
+<section class="panel active" id="treinos">
+
+  <div class="semana-bar">
+    <div class="semana-nav">
+      <button class="step" id="semanaPrev">‹</button>
+      <span class="titulo" id="semanaTitulo">Semana 1</span>
+      <button class="step" id="semanaNext">›</button>
+    </div>
+    <div class="semana-pills" id="semanaPills"></div>
+    <div class="semana-sub" id="semanaSub"></div>
+  </div>
+
+  <div id="weeksWrap"></div>
+
+</section>
+
+<!-- SOBRE -->
+<section class="panel" id="sobre">
+
+  <details>
+    <summary>📊 Índices oficiais do TAF (Corpo da Armada)</summary>
+    <div class="details-body">
+      <p>Fonte: CGCFN-108 REV2, item 5.5.1 e Anexo P. Aprovação: mínimo nota 5 (50 pontos) em cada uma das 4 provas. Sem barra fixa e sem flexão de braço — exclusivas do TAF de Fuzileiros Navais.</p>
+      <table>
+        <tr><th>Prova</th><th>Critério</th></tr>
+        <tr><td>Natação (50 m)</td><td>Tempo, por idade e sexo</td></tr>
+        <tr><td>Permanência 10 min n'água</td><td>Aprovado/reprovado — vale nota 5 fixa (50 pontos) se aprovado</td></tr>
+        <tr><td>Abdominal — prancha isométrica</td><td>Tempo sustentado, por idade e sexo</td></tr>
+        <tr><td>Corrida (2.400 m)</td><td>Tempo, por idade e sexo</td></tr>
+      </table>
+      <p><strong>Corrida 2.400 m — Masculino</strong> (min:seg, tabela 2027–2028)</p>
+      <table>
+        <tr><th>Idade</th><th>Nota 5</th><th>Nota 7</th><th>Nota 10</th></tr>
+        <tr><td>18–25</td><td>14:12</td><td>12:07</td><td>09:26</td></tr>
+        <tr><td>26–33</td><td>14:48</td><td>12:37</td><td>09:54</td></tr>
+        <tr><td>34–39</td><td>15:26</td><td>13:22</td><td>10:45</td></tr>
+        <tr><td>40–45</td><td>16:21</td><td>14:16</td><td>11:33</td></tr>
+        <tr><td>46–49</td><td>17:24</td><td>15:22</td><td>13:09</td></tr>
+        <tr><td>&gt;50</td><td>18:39</td><td>16:40</td><td>14:44</td></tr>
+      </table>
+      <p><strong>Corrida 2.400 m — Feminino</strong> (min:seg, tabela 2027)</p>
+      <table>
+        <tr><th>Idade</th><th>Nota 5</th><th>Nota 7</th><th>Nota 10</th></tr>
+        <tr><td>18–25</td><td>15:40</td><td>14:06</td><td>11:12</td></tr>
+        <tr><td>26–33</td><td>16:16</td><td>14:36</td><td>12:00</td></tr>
+        <tr><td>34–39</td><td>16:40</td><td>15:36</td><td>12:48</td></tr>
+        <tr><td>40–45</td><td>17:52</td><td>16:18</td><td>13:36</td></tr>
+        <tr><td>46–49</td><td>18:58</td><td>17:18</td><td>14:24</td></tr>
+        <tr><td>&gt;50</td><td>20:04</td><td>18:36</td><td>16:00</td></tr>
+      </table>
+      <p><strong>Prancha isométrica — Masculino</strong> (min:seg sustentados, tabela 2027–2028)</p>
+      <table>
+        <tr><th>Idade</th><th>Nota 5</th><th>Nota 7</th><th>Nota 10</th></tr>
+        <tr><td>18–25</td><td>01:05</td><td>01:46</td><td>02:48</td></tr>
+        <tr><td>26–33</td><td>01:00</td><td>01:41</td><td>02:41</td></tr>
+        <tr><td>34–39</td><td>00:57</td><td>01:36</td><td>02:35</td></tr>
+        <tr><td>40–45</td><td>00:53</td><td>01:31</td><td>02:30</td></tr>
+        <tr><td>46–49</td><td>00:50</td><td>01:28</td><td>02:26</td></tr>
+        <tr><td>&gt;50</td><td>00:47</td><td>01:24</td><td>02:20</td></tr>
+      </table>
+      <p><strong>Prancha isométrica — Feminino</strong> (min:seg sustentados, tabela 2027–2028)</p>
+      <table>
+        <tr><th>Idade</th><th>Nota 5</th><th>Nota 7</th><th>Nota 10</th></tr>
+        <tr><td>18–25</td><td>00:56</td><td>01:36</td><td>02:36</td></tr>
+        <tr><td>26–33</td><td>00:52</td><td>01:30</td><td>02:30</td></tr>
+        <tr><td>34–39</td><td>00:48</td><td>01:24</td><td>02:25</td></tr>
+        <tr><td>40–45</td><td>00:45</td><td>01:21</td><td>02:19</td></tr>
+        <tr><td>46–49</td><td>00:42</td><td>01:16</td><td>02:15</td></tr>
+        <tr><td>&gt;50</td><td>00:38</td><td>01:16</td><td>02:09</td></tr>
+      </table>
+      <div class="note">Notas de 5 a 10 correspondem a 50–100 pontos, na escala oficial do TAF. Tabelas sobem gradualmente até 2031 — valores acima são os de 2027–2028, os mais próximos de hoje. Natação e permanência têm tabela própria no Anexo P; treinar quando houver acesso a piscina em porto.</div>
+    </div>
+  </details>
+
+  <details>
+    <summary>🧪 Avaliação inicial (antes da semana 1) e reavaliações</summary>
+    <div class="details-body">
+      <p><strong>O cálculo é automático:</strong> na primeira vez que você abre o app, ele já pede o teste — corra os 2.400 m cronometrando o tempo total e, depois, sustente a prancha isométrica o máximo que aguentar, também cronometrado. Informe sexo, faixa etária e os dois tempos, e o app calcula sua nota em cada prova (usando a tabela oficial acima) e te encaminha direto para o nível certo.</p>
+      <p>O nível usado é sempre o da <strong>pior das duas notas</strong>:</p>
+      <table>
+        <tr><th>Nota (a pior das duas)</th><th>Nível</th></tr>
+        <tr><td>Abaixo de 5, ou nunca treinou pesado</td><td>Iniciante</td></tr>
+        <tr><td>Entre 5 e 7</td><td>Intermediário</td></tr>
+        <tr><td>7 ou mais</td><td>Avançado</td></tr>
+      </table>
+      <p>Ainda não fez o teste? Dá pra escolher o nível na mão pelo link "escolher nível manualmente" na tela inicial — mas o ideal é sempre testar primeiro. Repita o teste a cada 4 semanas e clique em "trocar" no topo da tela para recalcular.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>🛡️ Segurança e recuperação</summary>
+    <div class="details-body">
+      <p><strong>Técnica oficial da prancha:</strong> antebraços no solo, cotovelos sob os ombros, corpo reto da cabeça aos calcanhares, pés na largura do quadril. O teste é interrompido se tocar o solo com outra parte do corpo, tirar um apoio, perder o alinhamento, elevar/arriar o quadril, flexionar os joelhos ou sentir dor/fadiga excessiva. Treinar sempre nessa técnica.</p>
+      <p><strong>Carga (PSE):</strong> registrar, após cada treino, a percepção de esforço (0–10) × duração em minutos. Picos muito acima da média das últimas semanas pedem redução de volume.</p>
+      <p><strong>Atenção:</strong> ombro, lombar e joelho são as regiões mais sujeitas a lesão em treino intenso — dor persistente (além do desconforto normal do esforço) é sinal para reduzir carga.</p>
+      <p><strong>Recuperação:</strong> 48h costumam bastar após uma sessão isolada de alta intensidade. Recuperação ativa (caminhada leve, mobilidade) por mais de 15 min ajuda mais que repouso total. Repor carboidrato logo após o treino acelera a recuperação. Hidratação constante ao longo do dia — especialmente relevante em ambiente de calor/umidade a bordo.</p>
+    </div>
+  </details>
+
+</section>
+
+</main>
+
+<footer>Programa genérico de preparação física — referência de treino, não substitui avaliação médica/profissional de educação física individualizada.</footer>
+
+</div>
+
+<div id="adminTrigger" style="display:none;"><a href="#" id="adminLink">admin</a></div>
+
+<div class="admin-modal-bg" id="adminLoginModal" style="display:none;">
+  <div class="admin-modal">
+    <h2>Painel admin</h2>
+    <input type="text" id="adminNipInput" inputmode="numeric" placeholder="NIP" autocomplete="off">
+    <input type="password" id="adminSenhaInput" placeholder="Senha" autocomplete="off">
+    <div>
+      <button type="button" id="adminLoginBtn">Entrar</button>
+      <button type="button" class="fechar" id="cancelarAdminLogin">Cancelar</button>
+    </div>
+    <div class="nip-erro" id="adminLoginErro"></div>
+  </div>
+</div>
+
+<div class="admin-modal-bg" id="adminPanelModal" style="display:none;">
+  <div class="admin-modal">
+    <h2>Log de acessos</h2>
+    <div class="admin-resumo" id="adminResumo">Carregando…</div>
+    <div id="adminLogWrap"></div>
+    <button type="button" class="fechar" id="fecharAdminPanel">Fechar</button>
+  </div>
+</div>
+
+<script>
+const WEEKS = [{"week": 1, "bloco": "Bloco 1 · Base", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade articular (ombro, quadril, tornozelo) + ativação de glúteo com o peso do corpo", "ini": "Prancha frontal + prancha lateral: 3×15s · agachamento com salto controlado + afundo reverso: 3×7 · flexão com joelhos apoiados: 3×7 (carga: peso do corpo (sem carga extra))", "int": "Prancha frontal + prancha lateral: 4×20s · agachamento com salto controlado + afundo reverso: 4×10 · flexão de solo completa: 4×10 (carga: halteres leves a moderados)", "adv": "Prancha frontal + prancha lateral: 4×30s · agachamento com salto controlado + afundo reverso: 4×13 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×13 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de caminhada rápida + mobilidade dinâmica de tornozelo e quadril", "ini": "15 min de corrida contínua em ritmo fácil — RPE 3-4, ritmo em que dá pra conversar", "int": "21 min de corrida contínua em ritmo fácil — RPE 3-4, ritmo em que dá pra conversar", "adv": "30 min de corrida contínua em ritmo fácil — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "4× 400 m fortes (trote leve de 200 m entre tiros) · fecha com Prancha RKC (glúteo e abdômen ao máximo, pico de 3s a cada 10s): 2×10s — RPE 8-9 nos tiros", "int": "6× 400 m fortes (trote leve de 200 m entre tiros) · fecha com Prancha RKC (glúteo e abdômen ao máximo, pico de 3s a cada 10s): 2×15s — RPE 8-9 nos tiros", "adv": "8× 400 m fortes (trote leve de 200 m entre tiros) · fecha com Prancha RKC (glúteo e abdômen ao máximo, pico de 3s a cada 10s): 2×20s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade articular (ombro, quadril, tornozelo) + ativação de glúteo com o peso do corpo", "ini": "saltos verticais + arremesso de anilha no chão (slam) + prancha: 3×5 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos verticais + arremesso de anilha no chão (slam) + prancha: 4×7 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos verticais + arremesso de anilha no chão (slam) + prancha: 4×9 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Circuito funcional", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "Circuito funcional — 3 voltas: flexão + prancha + agachamento + escalador (mountain climber) — RPE 7-8, descanso só entre voltas", "int": "Circuito funcional — 4 voltas: flexão + prancha + agachamento + escalador (mountain climber) — RPE 7-8, descanso só entre voltas", "adv": "Circuito funcional — 5 voltas: flexão + prancha + agachamento + escalador (mountain climber) — RPE 7-8, descanso só entre voltas"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de caminhada rápida + mobilidade dinâmica de tornozelo e quadril", "ini": "24 min — corrida longa contínua em ritmo fácil — RPE 3-4, sem pressa", "int": "33 min — corrida longa contínua em ritmo fácil — RPE 3-4, sem pressa", "adv": "42 min — corrida longa contínua em ritmo fácil — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade de ombro (rotações, alongamento de peitoral/dorsal) + caminhada leve", "int": "20-30 min: mobilidade de ombro (rotações, alongamento de peitoral/dorsal) + caminhada leve", "adv": "20-30 min: mobilidade de ombro (rotações, alongamento de peitoral/dorsal) + caminhada leve"}]}, {"week": 2, "bloco": "Bloco 1 · Base", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Rotação de tronco e ombro + agachamento livre lento (2x10) para aquecer as articulações", "ini": "Prancha com toque alternado de ombro: 3×15s · passada caminhando (walking lunge) + agachamento com pausa de 2s embaixo: 3×8 · flexão com joelhos apoiados: 3×8 (carga: peso do corpo (sem carga extra))", "int": "Prancha com toque alternado de ombro: 4×25s · passada caminhando (walking lunge) + agachamento com pausa de 2s embaixo: 4×11 · flexão de solo completa: 4×11 (carga: halteres leves a moderados)", "adv": "Prancha com toque alternado de ombro: 4×30s · passada caminhando (walking lunge) + agachamento com pausa de 2s embaixo: 4×14 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×14 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de trote bem leve + educativos de corrida (skip baixo, elevação de calcanhar)", "ini": "18 min de corrida contínua + 4 acelerações curtas de 15s soltas no final — RPE 3-4, ritmo em que dá pra conversar", "int": "24 min de corrida contínua + 4 acelerações curtas de 15s soltas no final — RPE 3-4, ritmo em que dá pra conversar", "adv": "30 min de corrida contínua + 4 acelerações curtas de 15s soltas no final — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "5× 800 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha unilateral (retirando um apoio de braço por vez): 2×10s — RPE 8-9 nos tiros", "int": "7× 800 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha unilateral (retirando um apoio de braço por vez): 2×15s — RPE 8-9 nos tiros", "adv": "9× 800 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha unilateral (retirando um apoio de braço por vez): 2×20s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Rotação de tronco e ombro + agachamento livre lento (2x10) para aquecer as articulações", "ini": "saltos com contramovimento + afundo com salto + remada australiana na barra: 3×5 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos com contramovimento + afundo com salto + remada australiana na barra: 4×8 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos com contramovimento + afundo com salto + remada australiana na barra: 4×10 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Tempo run", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "Tempo run: 12 min contínuos — ritmo de prova controlado, sem deixar acumular fadiga rápido demais (RPE 6-7)", "int": "Tempo run: 17 min contínuos — ritmo de prova controlado, sem deixar acumular fadiga rápido demais (RPE 6-7)", "adv": "Tempo run: 23 min contínuos — ritmo de prova controlado, sem deixar acumular fadiga rápido demais (RPE 6-7)"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de trote bem leve + educativos de corrida (skip baixo, elevação de calcanhar)", "ini": "24 min — corrida longa em terreno variado (alternar percurso quando possível) — RPE 3-4, sem pressa", "int": "36 min — corrida longa em terreno variado (alternar percurso quando possível) — RPE 3-4, sem pressa", "adv": "45 min — corrida longa em terreno variado (alternar percurso quando possível) — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade de lombar/quadril (gato-camelo, alongamento de flexores) + caminhada leve", "int": "20-30 min: mobilidade de lombar/quadril (gato-camelo, alongamento de flexores) + caminhada leve", "adv": "20-30 min: mobilidade de lombar/quadril (gato-camelo, alongamento de flexores) + caminhada leve"}]}, {"week": 3, "bloco": "Bloco 1 · Base", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade dinâmica geral + skips baixos no lugar (30s) para elevar a temperatura corporal", "ini": "Prancha frontal com elevação de perna alternada: 3×20s · afundo cruzado (curtsy lunge) + agachamento sumô: 3×9 · flexão com joelhos apoiados: 3×9 (carga: peso do corpo (sem carga extra))", "int": "Prancha frontal com elevação de perna alternada: 4×25s · afundo cruzado (curtsy lunge) + agachamento sumô: 4×12 · flexão de solo completa: 4×12 (carga: halteres leves a moderados)", "adv": "Prancha frontal com elevação de perna alternada: 4×35s · afundo cruzado (curtsy lunge) + agachamento sumô: 4×16 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×16 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "Mobilidade dinâmica geral (5 min) + 3 acelerações curtas de 15 m soltas", "ini": "18 min de corrida em terreno irregular/convés variado, ritmo fácil — RPE 3-4, ritmo em que dá pra conversar", "int": "27 min de corrida em terreno irregular/convés variado, ritmo fácil — RPE 3-4, ritmo em que dá pra conversar", "adv": "36 min de corrida em terreno irregular/convés variado, ritmo fácil — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "piramidal 200-400-600-400-200 m forte — 6 blocos/tiros (trote leve igual ao tempo do tiro anterior) · fecha com Prancha frontal com marcha (elevação alternada de pé, sem tocar o solo): 2×15s — RPE 8-9 nos tiros", "int": "piramidal 200-400-600-400-200 m forte — 8 blocos/tiros (trote leve igual ao tempo do tiro anterior) · fecha com Prancha frontal com marcha (elevação alternada de pé, sem tocar o solo): 2×20s — RPE 8-9 nos tiros", "adv": "piramidal 200-400-600-400-200 m forte — 11 blocos/tiros (trote leve igual ao tempo do tiro anterior) · fecha com Prancha frontal com marcha (elevação alternada de pé, sem tocar o solo): 2×25s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade dinâmica geral + skips baixos no lugar (30s) para elevar a temperatura corporal", "ini": "agachamento com salto + flexão explosiva (mãos saem do chão) + prancha lateral: 3×6 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "agachamento com salto + flexão explosiva (mãos saem do chão) + prancha lateral: 4×8 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "agachamento com salto + flexão explosiva (mãos saem do chão) + prancha lateral: 4×11 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Corrida no ritmo-alvo do TAF", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "1050 m no ritmo-alvo da prova de 2.400 m — foco em não perder o pace na segunda metade", "int": "1450 m no ritmo-alvo da prova de 2.400 m — foco em não perder o pace na segunda metade", "adv": "1900 m no ritmo-alvo da prova de 2.400 m — foco em não perder o pace na segunda metade"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "Mobilidade dinâmica geral (5 min) + 3 acelerações curtas de 15 m soltas", "ini": "27 min — corrida longa progressiva (últimos 10 min um pouco mais fortes) — RPE 3-4, sem pressa", "int": "39 min — corrida longa progressiva (últimos 10 min um pouco mais fortes) — RPE 3-4, sem pressa", "adv": "51 min — corrida longa progressiva (últimos 10 min um pouco mais fortes) — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade de joelho/tornozelo (círculos, alongamento de panturrilha) + caminhada leve", "int": "20-30 min: mobilidade de joelho/tornozelo (círculos, alongamento de panturrilha) + caminhada leve", "adv": "20-30 min: mobilidade de joelho/tornozelo (círculos, alongamento de panturrilha) + caminhada leve"}]}, {"week": 4, "bloco": "Bloco 1 · Base", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Ativação de core (prancha curta 2x15s) + mobilidade de quadril (agachamento profundo sustentado)", "ini": "Prancha lateral com rotação (thread-the-needle): 3×15s · step-up em banco/caixa + afundo búlgaro: 3×6 · flexão com joelhos apoiados: 3×6 (carga: peso do corpo (sem carga extra))", "int": "Prancha lateral com rotação (thread-the-needle): 4×20s · step-up em banco/caixa + afundo búlgaro: 4×8 · flexão de solo completa: 4×8 (carga: halteres leves a moderados)", "adv": "Prancha lateral com rotação (thread-the-needle): 4×25s · step-up em banco/caixa + afundo búlgaro: 4×11 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×11 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "Caminhada + trote intercalado (3 min) para elevar a frequência cardíaca aos poucos", "ini": "12 min de fartlek muito leve (variações espontâneas de ritmo, sem forçar) — RPE 3-4, ritmo em que dá pra conversar", "int": "18 min de fartlek muito leve (variações espontâneas de ritmo, sem forçar) — RPE 3-4, ritmo em que dá pra conversar", "adv": "24 min de fartlek muito leve (variações espontâneas de ritmo, sem forçar) — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote progressivo + mobilidade dinâmica + 3 tiros curtos de 20 m em ritmo forte controlado", "ini": "6× 1000 m fortes (trote leve de 90s entre tiros) · fecha com Prancha com braços estendidos (apoio de mãos, tipo flexão) em vez de antebraço: 2×10s — RPE 8-9 nos tiros", "int": "9× 1000 m fortes (trote leve de 90s entre tiros) · fecha com Prancha com braços estendidos (apoio de mãos, tipo flexão) em vez de antebraço: 2×10s — RPE 8-9 nos tiros", "adv": "12× 1000 m fortes (trote leve de 90s entre tiros) · fecha com Prancha com braços estendidos (apoio de mãos, tipo flexão) em vez de antebraço: 2×15s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Ativação de core (prancha curta 2x15s) + mobilidade de quadril (agachamento profundo sustentado)", "ini": "saltos em avanço (bound) + push press com halteres + prancha: 3×4 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos em avanço (bound) + push press com halteres + prancha: 4×6 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos em avanço (bound) + push press com halteres + prancha: 4×7 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Circuito funcional", "aquec": "8 min de trote progressivo + mobilidade dinâmica + 3 tiros curtos de 20 m em ritmo forte controlado", "ini": "Circuito funcional — 3 voltas: burpee + afundo + prancha + barra fixa — RPE 7-8, descanso só entre voltas", "int": "Circuito funcional — 3 voltas: burpee + afundo + prancha + barra fixa — RPE 7-8, descanso só entre voltas", "adv": "Circuito funcional — 4 voltas: burpee + afundo + prancha + barra fixa — RPE 7-8, descanso só entre voltas"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "Caminhada + trote intercalado (3 min) para elevar a frequência cardíaca aos poucos", "ini": "18 min — corrida longa fracionada (2 blocos com 2 min de caminhada no meio) — RPE 3-4, sem pressa", "int": "27 min — corrida longa fracionada (2 blocos com 2 min de caminhada no meio) — RPE 3-4, sem pressa", "adv": "33 min — corrida longa fracionada (2 blocos com 2 min de caminhada no meio) — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: liberação miofascial geral (rolo ou bola, se disponível) + caminhada leve", "int": "20-30 min: liberação miofascial geral (rolo ou bola, se disponível) + caminhada leve", "adv": "20-30 min: liberação miofascial geral (rolo ou bola, se disponível) + caminhada leve"}]}, {"week": 5, "bloco": "Bloco 2 · Desenvolvimento", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Circular de ombro/braço + afundo lento sem carga (2x8/perna) para preparar as pernas", "ini": "Prancha com puxada de joelho ao peito (mountain climber controlado): 3×20s · agachamento goblet (halter) + afundo estático: 3×8 · flexão com joelhos apoiados: 3×8 (carga: peso do corpo (sem carga extra))", "int": "Prancha com puxada de joelho ao peito (mountain climber controlado): 4×25s · agachamento goblet (halter) + afundo estático: 4×12 · flexão de solo completa: 4×12 (carga: halteres leves a moderados)", "adv": "Prancha com puxada de joelho ao peito (mountain climber controlado): 4×35s · agachamento goblet (halter) + afundo estático: 4×16 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×16 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de mobilidade de quadril/tornozelo + trote leve progressivo", "ini": "18 min de corrida fácil + educativos de corrida (skip baixo, elevação de calcanhar) no final — RPE 3-4, ritmo em que dá pra conversar", "int": "27 min de corrida fácil + educativos de corrida (skip baixo, elevação de calcanhar) no final — RPE 3-4, ritmo em que dá pra conversar", "adv": "33 min de corrida fácil + educativos de corrida (skip baixo, elevação de calcanhar) no final — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "fartlek forte (1min forte / 1min fácil) — 5 blocos/tiros (alternância direta, sem parar) · fecha com Prancha lateral com elevação de perna superior: 2×15s — RPE 8-9 nos tiros", "int": "fartlek forte (1min forte / 1min fácil) — 7 blocos/tiros (alternância direta, sem parar) · fecha com Prancha lateral com elevação de perna superior: 2×20s — RPE 8-9 nos tiros", "adv": "fartlek forte (1min forte / 1min fácil) — 9 blocos/tiros (alternância direta, sem parar) · fecha com Prancha lateral com elevação de perna superior: 2×25s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Circular de ombro/braço + afundo lento sem carga (2x8/perna) para preparar as pernas", "ini": "skipping alto + salto lateral + barra fixa (dead hang ou negativa controlada): 3×6 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "skipping alto + salto lateral + barra fixa (dead hang ou negativa controlada): 4×8 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "skipping alto + salto lateral + barra fixa (dead hang ou negativa controlada): 4×11 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Tempo run", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "Tempo run: 14 min contínuos — ritmo forte constante, sem variar a velocidade (RPE 6-7)", "int": "Tempo run: 19 min contínuos — ritmo forte constante, sem variar a velocidade (RPE 6-7)", "adv": "Tempo run: 25 min contínuos — ritmo forte constante, sem variar a velocidade (RPE 6-7)"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de mobilidade de quadril/tornozelo + trote leve progressivo", "ini": "27 min — corrida longa + 6 acelerações curtas de 20s espalhadas no percurso — RPE 3-4, sem pressa", "int": "39 min — corrida longa + 6 acelerações curtas de 20s espalhadas no percurso — RPE 3-4, sem pressa", "adv": "51 min — corrida longa + 6 acelerações curtas de 20s espalhadas no percurso — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade completa (ombro + quadril + tornozelo) + caminhada leve", "int": "20-30 min: mobilidade completa (ombro + quadril + tornozelo) + caminhada leve", "adv": "20-30 min: mobilidade completa (ombro + quadril + tornozelo) + caminhada leve"}]}, {"week": 6, "bloco": "Bloco 2 · Desenvolvimento", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade de coluna torácica + saltitos leves no lugar (20s) para ativar o sistema nervoso", "ini": "Prancha RKC (glúteo e abdômen ao máximo, pico de 3s a cada 10s): 3×20s · agachamento unilateral apoiado (pistol assistido) + afundo caminhando com halteres: 3×9 · flexão com joelhos apoiados: 3×9 (carga: peso do corpo (sem carga extra))", "int": "Prancha RKC (glúteo e abdômen ao máximo, pico de 3s a cada 10s): 4×30s · agachamento unilateral apoiado (pistol assistido) + afundo caminhando com halteres: 4×13 · flexão de solo completa: 4×13 (carga: halteres leves a moderados)", "adv": "Prancha RKC (glúteo e abdômen ao máximo, pico de 3s a cada 10s): 4×35s · agachamento unilateral apoiado (pistol assistido) + afundo caminhando com halteres: 4×17 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×17 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de caminhada rápida + mobilidade dinâmica de tornozelo e quadril", "ini": "21 min de corrida progressiva (começa bem leve, termina em ritmo fácil-moderado) — RPE 3-4, ritmo em que dá pra conversar", "int": "27 min de corrida progressiva (começa bem leve, termina em ritmo fácil-moderado) — RPE 3-4, ritmo em que dá pra conversar", "adv": "36 min de corrida progressiva (começa bem leve, termina em ritmo fácil-moderado) — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "tiros de subida (30-40s forte, desce trotando) — 6 blocos/tiros (descida trotando como recuperação) · fecha com Prancha frontal em superfície instável (toalha dobrada/almofada sob os pés): 2×15s — RPE 8-9 nos tiros", "int": "tiros de subida (30-40s forte, desce trotando) — 8 blocos/tiros (descida trotando como recuperação) · fecha com Prancha frontal em superfície instável (toalha dobrada/almofada sob os pés): 2×20s — RPE 8-9 nos tiros", "adv": "tiros de subida (30-40s forte, desce trotando) — 11 blocos/tiros (descida trotando como recuperação) · fecha com Prancha frontal em superfície instável (toalha dobrada/almofada sob os pés): 2×25s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade de coluna torácica + saltitos leves no lugar (20s) para ativar o sistema nervoso", "ini": "salto em caixa/step alto + afundo com halteres + prancha: 3×6 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "salto em caixa/step alto + afundo com halteres + prancha: 4×9 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "salto em caixa/step alto + afundo com halteres + prancha: 4×12 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Corrida no ritmo-alvo do TAF", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "1100 m no ritmo-alvo da prova de 2.400 m — foco em simular a pressão da prova oficial", "int": "1550 m no ritmo-alvo da prova de 2.400 m — foco em simular a pressão da prova oficial", "adv": "2000 m no ritmo-alvo da prova de 2.400 m — foco em simular a pressão da prova oficial"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de caminhada rápida + mobilidade dinâmica de tornozelo e quadril", "ini": "30 min — corrida longa em ritmo de conversa, sem pressa nenhuma — RPE 3-4, sem pressa", "int": "42 min — corrida longa em ritmo de conversa, sem pressa nenhuma — RPE 3-4, sem pressa", "adv": "54 min — corrida longa em ritmo de conversa, sem pressa nenhuma — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: alongamento estático geral (cadeia posterior) + caminhada leve", "int": "20-30 min: alongamento estático geral (cadeia posterior) + caminhada leve", "adv": "20-30 min: alongamento estático geral (cadeia posterior) + caminhada leve"}]}, {"week": 7, "bloco": "Bloco 2 · Desenvolvimento", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade articular (ombro, quadril, tornozelo) + ativação de glúteo com o peso do corpo", "ini": "Prancha unilateral (retirando um apoio de braço por vez): 3×20s · elevação de quadril (hip thrust) + agachamento com halteres: 3×10 · flexão com joelhos apoiados: 3×10 (carga: peso do corpo (sem carga extra))", "int": "Prancha unilateral (retirando um apoio de braço por vez): 4×30s · elevação de quadril (hip thrust) + agachamento com halteres: 4×14 · flexão de solo completa: 4×14 (carga: halteres leves a moderados)", "adv": "Prancha unilateral (retirando um apoio de braço por vez): 4×40s · elevação de quadril (hip thrust) + agachamento com halteres: 4×18 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×18 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de trote bem leve + educativos de corrida (skip baixo, elevação de calcanhar)", "ini": "21 min de corrida fácil em ritmo de conversa constante — RPE 3-4, ritmo em que dá pra conversar", "int": "30 min de corrida fácil em ritmo de conversa constante — RPE 3-4, ritmo em que dá pra conversar", "adv": "42 min de corrida fácil em ritmo de conversa constante — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "7× 600 m fortes (trote leve de 90s entre tiros) · fecha com Prancha reversa (de frente para cima, apoiada em mãos e calcanhares): 2×15s — RPE 8-9 nos tiros", "int": "9× 600 m fortes (trote leve de 90s entre tiros) · fecha com Prancha reversa (de frente para cima, apoiada em mãos e calcanhares): 2×20s — RPE 8-9 nos tiros", "adv": "12× 600 m fortes (trote leve de 90s entre tiros) · fecha com Prancha reversa (de frente para cima, apoiada em mãos e calcanhares): 2×30s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade articular (ombro, quadril, tornozelo) + ativação de glúteo com o peso do corpo", "ini": "sprint curto (10-15 m) + salto vertical + prancha: 3×7 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "sprint curto (10-15 m) + salto vertical + prancha: 4×10 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "sprint curto (10-15 m) + salto vertical + prancha: 4×12 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Circuito funcional", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "Circuito funcional — 4 voltas: flexão + agachamento sumô + corda (pular) + prancha frontal — RPE 7-8, descanso só entre voltas", "int": "Circuito funcional — 6 voltas: flexão + agachamento sumô + corda (pular) + prancha frontal — RPE 7-8, descanso só entre voltas", "adv": "Circuito funcional — 6 voltas: flexão + agachamento sumô + corda (pular) + prancha frontal — RPE 7-8, descanso só entre voltas"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de trote bem leve + educativos de corrida (skip baixo, elevação de calcanhar)", "ini": "33 min — corrida longa + 5 min finais em ritmo levemente mais forte — RPE 3-4, sem pressa", "int": "45 min — corrida longa + 5 min finais em ritmo levemente mais forte — RPE 3-4, sem pressa", "adv": "60 min — corrida longa + 5 min finais em ritmo levemente mais forte — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade de coluna torácica + caminhada leve", "int": "20-30 min: mobilidade de coluna torácica + caminhada leve", "adv": "20-30 min: mobilidade de coluna torácica + caminhada leve"}]}, {"week": 8, "bloco": "Bloco 2 · Desenvolvimento", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Rotação de tronco e ombro + agachamento livre lento (2x10) para aquecer as articulações", "ini": "Prancha frontal com marcha (elevação alternada de pé, sem tocar o solo): 3×15s · afundo lateral alternado + agachamento com pausa de 3s embaixo: 3×7 · flexão com joelhos apoiados: 3×7 (carga: peso do corpo (sem carga extra))", "int": "Prancha frontal com marcha (elevação alternada de pé, sem tocar o solo): 4×20s · afundo lateral alternado + agachamento com pausa de 3s embaixo: 4×9 · flexão de solo completa: 4×9 (carga: halteres leves a moderados)", "adv": "Prancha frontal com marcha (elevação alternada de pé, sem tocar o solo): 4×25s · afundo lateral alternado + agachamento com pausa de 3s embaixo: 4×12 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×12 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "Mobilidade dinâmica geral (5 min) + 3 acelerações curtas de 15 m soltas", "ini": "15 min de corrida fácil + 5 min de caminhada final para soltar — RPE 3-4, ritmo em que dá pra conversar", "int": "21 min de corrida fácil + 5 min de caminhada final para soltar — RPE 3-4, ritmo em que dá pra conversar", "adv": "27 min de corrida fácil + 5 min de caminhada final para soltar — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote progressivo + mobilidade dinâmica + 3 tiros curtos de 20 m em ritmo forte controlado", "ini": "fartlek longo (3min forte / 2min fácil) — 8 blocos/tiros (alternância direta, sem parar) · fecha com Prancha com toque de mão oposta no ombro (cross-body): 2×10s — RPE 8-9 nos tiros", "int": "fartlek longo (3min forte / 2min fácil) — 11 blocos/tiros (alternância direta, sem parar) · fecha com Prancha com toque de mão oposta no ombro (cross-body): 2×15s — RPE 8-9 nos tiros", "adv": "fartlek longo (3min forte / 2min fácil) — 14 blocos/tiros (alternância direta, sem parar) · fecha com Prancha com toque de mão oposta no ombro (cross-body): 2×20s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Rotação de tronco e ombro + agachamento livre lento (2x10) para aquecer as articulações", "ini": "burpee sem flexão + salto lateral + barra fixa (repetições estritas): 3×5 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "burpee sem flexão + salto lateral + barra fixa (repetições estritas): 4×7 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "burpee sem flexão + salto lateral + barra fixa (repetições estritas): 4×9 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Tempo run", "aquec": "8 min de trote progressivo + mobilidade dinâmica + 3 tiros curtos de 20 m em ritmo forte controlado", "ini": "Tempo run: 11 min contínuos — ritmo firme, foco em respiração controlada (RPE 6-7)", "int": "Tempo run: 15 min contínuos — ritmo firme, foco em respiração controlada (RPE 6-7)", "adv": "Tempo run: 20 min contínuos — ritmo firme, foco em respiração controlada (RPE 6-7)"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "Mobilidade dinâmica geral (5 min) + 3 acelerações curtas de 15 m soltas", "ini": "21 min — corrida longa contínua, foco em manter a cadência estável — RPE 3-4, sem pressa", "int": "30 min — corrida longa contínua, foco em manter a cadência estável — RPE 3-4, sem pressa", "adv": "39 min — corrida longa contínua, foco em manter a cadência estável — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: caminhada leve + respiração/relaxamento, sem exercício estruturado", "int": "20-30 min: caminhada leve + respiração/relaxamento, sem exercício estruturado", "adv": "20-30 min: caminhada leve + respiração/relaxamento, sem exercício estruturado"}]}, {"week": 9, "bloco": "Bloco 3 · Específico", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade dinâmica geral + skips baixos no lugar (30s) para elevar a temperatura corporal", "ini": "Prancha com braços estendidos (apoio de mãos, tipo flexão) em vez de antebraço: 3×20s · passada com halteres + agachamento sumô com pausa: 3×10 · flexão com joelhos apoiados: 3×10 (carga: peso do corpo (sem carga extra))", "int": "Prancha com braços estendidos (apoio de mãos, tipo flexão) em vez de antebraço: 4×30s · passada com halteres + agachamento sumô com pausa: 4×14 · flexão de solo completa: 4×14 (carga: halteres leves a moderados)", "adv": "Prancha com braços estendidos (apoio de mãos, tipo flexão) em vez de antebraço: 4×40s · passada com halteres + agachamento sumô com pausa: 4×18 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×18 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "Caminhada + trote intercalado (3 min) para elevar a frequência cardíaca aos poucos", "ini": "21 min de corrida fácil alternando 3min corrida/1min caminhada nos primeiros 10min, depois contínua — RPE 3-4, ritmo em que dá pra conversar", "int": "30 min de corrida fácil alternando 3min corrida/1min caminhada nos primeiros 10min, depois contínua — RPE 3-4, ritmo em que dá pra conversar", "adv": "39 min de corrida fácil alternando 3min corrida/1min caminhada nos primeiros 10min, depois contínua — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "6× 300 m fortes (trote leve de 3 min (recuperação quase completa)) · fecha com Prancha frontal com expiração forçada a cada 5s (controle respiratório): 2×15s — RPE 8-9 nos tiros", "int": "8× 300 m fortes (trote leve de 3 min (recuperação quase completa)) · fecha com Prancha frontal com expiração forçada a cada 5s (controle respiratório): 2×20s — RPE 8-9 nos tiros", "adv": "11× 300 m fortes (trote leve de 3 min (recuperação quase completa)) · fecha com Prancha frontal com expiração forçada a cada 5s (controle respiratório): 2×25s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade dinâmica geral + skips baixos no lugar (30s) para elevar a temperatura corporal", "ini": "saltos unilaterais (uma perna) + arremesso de halter acima da cabeça + prancha: 3×7 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos unilaterais (uma perna) + arremesso de halter acima da cabeça + prancha: 4×9 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos unilaterais (uma perna) + arremesso de halter acima da cabeça + prancha: 4×12 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Corrida no ritmo-alvo do TAF", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "1150 m no ritmo-alvo da prova de 2.400 m — foco em manter cadência alta mesmo cansando", "int": "1600 m no ritmo-alvo da prova de 2.400 m — foco em manter cadência alta mesmo cansando", "adv": "2150 m no ritmo-alvo da prova de 2.400 m — foco em manter cadência alta mesmo cansando"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "Caminhada + trote intercalado (3 min) para elevar a frequência cardíaca aos poucos", "ini": "30 min — corrida longa dividida em 3 blocos fáceis com 1 min de caminhada entre eles — RPE 3-4, sem pressa", "int": "42 min — corrida longa dividida em 3 blocos fáceis com 1 min de caminhada entre eles — RPE 3-4, sem pressa", "adv": "57 min — corrida longa dividida em 3 blocos fáceis com 1 min de caminhada entre eles — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade de quadril (agachamento profundo sustentado + borboleta) + caminhada leve", "int": "20-30 min: mobilidade de quadril (agachamento profundo sustentado + borboleta) + caminhada leve", "adv": "20-30 min: mobilidade de quadril (agachamento profundo sustentado + borboleta) + caminhada leve"}]}, {"week": 10, "bloco": "Bloco 3 · Específico", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Ativação de core (prancha curta 2x15s) + mobilidade de quadril (agachamento profundo sustentado)", "ini": "Prancha lateral com elevação de perna superior: 3×25s · step-down controlado (excêntrico) + afundo búlgaro com halteres: 3×10 · flexão com joelhos apoiados: 3×10 (carga: peso do corpo (sem carga extra))", "int": "Prancha lateral com elevação de perna superior: 4×30s · step-down controlado (excêntrico) + afundo búlgaro com halteres: 4×15 · flexão de solo completa: 4×15 (carga: halteres leves a moderados)", "adv": "Prancha lateral com elevação de perna superior: 4×40s · step-down controlado (excêntrico) + afundo búlgaro com halteres: 4×18 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×18 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de mobilidade de quadril/tornozelo + trote leve progressivo", "ini": "24 min de corrida fácil + 3 progressões curtas de 20s no meio — RPE 3-4, ritmo em que dá pra conversar", "int": "33 min de corrida fácil + 3 progressões curtas de 20s no meio — RPE 3-4, ritmo em que dá pra conversar", "adv": "42 min de corrida fácil + 3 progressões curtas de 20s no meio — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "7× 500 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha lateral alternando os dois lados sem pausa entre eles: 2×15s — RPE 8-9 nos tiros", "int": "9× 500 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha lateral alternando os dois lados sem pausa entre eles: 2×20s — RPE 8-9 nos tiros", "adv": "12× 500 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha lateral alternando os dois lados sem pausa entre eles: 2×30s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Ativação de core (prancha curta 2x15s) + mobilidade de quadril (agachamento profundo sustentado)", "ini": "saltos com corda em ritmo intenso (30s) + afundo com salto + barra fixa: 3×7 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos com corda em ritmo intenso (30s) + afundo com salto + barra fixa: 4×10 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos com corda em ritmo intenso (30s) + afundo com salto + barra fixa: 4×12 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Circuito funcional", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "Circuito funcional — 4 voltas: afundo + barra (remada ou dead hang) + prancha lateral + corda (pular) — RPE 7-8, descanso só entre voltas", "int": "Circuito funcional — 6 voltas: afundo + barra (remada ou dead hang) + prancha lateral + corda (pular) — RPE 7-8, descanso só entre voltas", "adv": "Circuito funcional — 6 voltas: afundo + barra (remada ou dead hang) + prancha lateral + corda (pular) — RPE 7-8, descanso só entre voltas"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de mobilidade de quadril/tornozelo + trote leve progressivo", "ini": "33 min — corrida longa + mobilidade dinâmica antes de começar — RPE 3-4, sem pressa", "int": "48 min — corrida longa + mobilidade dinâmica antes de começar — RPE 3-4, sem pressa", "adv": "63 min — corrida longa + mobilidade dinâmica antes de começar — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: alongamento de panturrilha/tendão de aquiles + caminhada leve", "int": "20-30 min: alongamento de panturrilha/tendão de aquiles + caminhada leve", "adv": "20-30 min: alongamento de panturrilha/tendão de aquiles + caminhada leve"}]}, {"week": 11, "bloco": "Bloco 3 · Específico", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Circular de ombro/braço + afundo lento sem carga (2x8/perna) para preparar as pernas", "ini": "Prancha frontal em superfície instável (toalha dobrada/almofada sob os pés): 3×25s · agachamento com salto no lugar + afundo reverso com halteres: 3×12 · flexão com joelhos apoiados: 3×12 (carga: peso do corpo (sem carga extra))", "int": "Prancha frontal em superfície instável (toalha dobrada/almofada sob os pés): 4×35s · agachamento com salto no lugar + afundo reverso com halteres: 4×16 · flexão de solo completa: 4×16 (carga: halteres leves a moderados)", "adv": "Prancha frontal em superfície instável (toalha dobrada/almofada sob os pés): 4×45s · agachamento com salto no lugar + afundo reverso com halteres: 4×18 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×18 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de caminhada rápida + mobilidade dinâmica de tornozelo e quadril", "ini": "27 min de corrida fácil bem tranquila, foco só em soltar as pernas — RPE 3-4, ritmo em que dá pra conversar", "int": "36 min de corrida fácil bem tranquila, foco só em soltar as pernas — RPE 3-4, ritmo em que dá pra conversar", "adv": "45 min de corrida fácil bem tranquila, foco só em soltar as pernas — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "piramidal curto 200-300-400-300-200 m — 8 blocos/tiros (trote leve igual ao tempo do tiro anterior) · fecha com Prancha frontal com halter leve apoiado nas costas (sobrecarga): 2×15s — RPE 8-9 nos tiros", "int": "piramidal curto 200-300-400-300-200 m — 11 blocos/tiros (trote leve igual ao tempo do tiro anterior) · fecha com Prancha frontal com halter leve apoiado nas costas (sobrecarga): 2×25s — RPE 8-9 nos tiros", "adv": "piramidal curto 200-300-400-300-200 m — 14 blocos/tiros (trote leve igual ao tempo do tiro anterior) · fecha com Prancha frontal com halter leve apoiado nas costas (sobrecarga): 2×30s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Circular de ombro/braço + afundo lento sem carga (2x8/perna) para preparar as pernas", "ini": "saltos de profundidade (de um step baixo) + flexão explosiva + prancha lateral: 3×8 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos de profundidade (de um step baixo) + flexão explosiva + prancha lateral: 4×11 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos de profundidade (de um step baixo) + flexão explosiva + prancha lateral: 4×12 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Tempo run", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "Tempo run: 19 min contínuos — ritmo forte, simulando a exigência de uma prova cronometrada (RPE 6-7)", "int": "Tempo run: 26 min contínuos — ritmo forte, simulando a exigência de uma prova cronometrada (RPE 6-7)", "adv": "Tempo run: 30 min contínuos — ritmo forte, simulando a exigência de uma prova cronometrada (RPE 6-7)"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de caminhada rápida + mobilidade dinâmica de tornozelo e quadril", "ini": "36 min — corrida longa bem controlada — ideal para treinar hidratação — RPE 3-4, sem pressa", "int": "51 min — corrida longa bem controlada — ideal para treinar hidratação — RPE 3-4, sem pressa", "adv": "65 min — corrida longa bem controlada — ideal para treinar hidratação — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade de punho/antebraço (pós-barra fixa da semana) + caminhada leve", "int": "20-30 min: mobilidade de punho/antebraço (pós-barra fixa da semana) + caminhada leve", "adv": "20-30 min: mobilidade de punho/antebraço (pós-barra fixa da semana) + caminhada leve"}]}, {"week": 12, "bloco": "Bloco 3 · Específico", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade de coluna torácica + saltitos leves no lugar (20s) para ativar o sistema nervoso", "ini": "Prancha reversa (de frente para cima, apoiada em mãos e calcanhares): 3×15s · wall sit (isométrico) + afundo caminhando: 3×8 · flexão com joelhos apoiados: 3×8 (carga: peso do corpo (sem carga extra))", "int": "Prancha reversa (de frente para cima, apoiada em mãos e calcanhares): 4×25s · wall sit (isométrico) + afundo caminhando: 4×11 · flexão de solo completa: 4×11 (carga: halteres leves a moderados)", "adv": "Prancha reversa (de frente para cima, apoiada em mãos e calcanhares): 4×30s · wall sit (isométrico) + afundo caminhando: 4×14 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×14 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de trote bem leve + educativos de corrida (skip baixo, elevação de calcanhar)", "ini": "18 min de corrida fácil + mobilidade dinâmica antes (5 min) e depois — RPE 3-4, ritmo em que dá pra conversar", "int": "24 min de corrida fácil + mobilidade dinâmica antes (5 min) e depois — RPE 3-4, ritmo em que dá pra conversar", "adv": "30 min de corrida fácil + mobilidade dinâmica antes (5 min) e depois — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote progressivo + mobilidade dinâmica + 3 tiros curtos de 20 m em ritmo forte controlado", "ini": "fartlek variado (30s forte / 30s fácil) — 9 blocos/tiros (alternância direta, sem parar) · fecha com Prancha frontal + prancha lateral: 2×10s — RPE 8-9 nos tiros", "int": "fartlek variado (30s forte / 30s fácil) — 12 blocos/tiros (alternância direta, sem parar) · fecha com Prancha frontal + prancha lateral: 2×15s — RPE 8-9 nos tiros", "adv": "fartlek variado (30s forte / 30s fácil) — 14 blocos/tiros (alternância direta, sem parar) · fecha com Prancha frontal + prancha lateral: 2×20s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade de coluna torácica + saltitos leves no lugar (20s) para ativar o sistema nervoso", "ini": "sprint em subida curta + salto lateral + barra fixa: 3×5 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "sprint em subida curta + salto lateral + barra fixa: 4×8 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "sprint em subida curta + salto lateral + barra fixa: 4×10 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Corrida no ritmo-alvo do TAF", "aquec": "8 min de trote progressivo + mobilidade dinâmica + 3 tiros curtos de 20 m em ritmo forte controlado", "ini": "950 m no ritmo-alvo da prova de 2.400 m — foco em relaxar ombros e braços mesmo em ritmo forte", "int": "1300 m no ritmo-alvo da prova de 2.400 m — foco em relaxar ombros e braços mesmo em ritmo forte", "adv": "1700 m no ritmo-alvo da prova de 2.400 m — foco em relaxar ombros e braços mesmo em ritmo forte"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de trote bem leve + educativos de corrida (skip baixo, elevação de calcanhar)", "ini": "24 min — corrida longa progressiva (terço final mais forte que os dois primeiros) — RPE 3-4, sem pressa", "int": "36 min — corrida longa progressiva (terço final mais forte que os dois primeiros) — RPE 3-4, sem pressa", "adv": "45 min — corrida longa progressiva (terço final mais forte que os dois primeiros) — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: auto-massagem em pernas com objeto disponível + caminhada leve", "int": "20-30 min: auto-massagem em pernas com objeto disponível + caminhada leve", "adv": "20-30 min: auto-massagem em pernas com objeto disponível + caminhada leve"}]}, {"week": 13, "bloco": "Bloco 4 · Pico/Taper", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade articular (ombro, quadril, tornozelo) + ativação de glúteo com o peso do corpo", "ini": "Prancha com toque de mão oposta no ombro (cross-body): 3×20s · agachamento profundo + afundo búlgaro com halteres: 3×8 · flexão com joelhos apoiados: 3×8 (carga: peso do corpo (sem carga extra))", "int": "Prancha com toque de mão oposta no ombro (cross-body): 4×25s · agachamento profundo + afundo búlgaro com halteres: 4×12 · flexão de solo completa: 4×12 (carga: halteres leves a moderados)", "adv": "Prancha com toque de mão oposta no ombro (cross-body): 4×35s · agachamento profundo + afundo búlgaro com halteres: 4×15 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×15 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "Mobilidade dinâmica geral (5 min) + 3 acelerações curtas de 15 m soltas", "ini": "18 min de corrida fácil em ritmo constante, testando respiração nasal — RPE 3-4, ritmo em que dá pra conversar", "int": "24 min de corrida fácil em ritmo constante, testando respiração nasal — RPE 3-4, ritmo em que dá pra conversar", "adv": "33 min de corrida fácil em ritmo constante, testando respiração nasal — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "5× 1200 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha com toque alternado de ombro: 2×10s — RPE 8-9 nos tiros", "int": "7× 1200 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha com toque alternado de ombro: 2×15s — RPE 8-9 nos tiros", "adv": "9× 1200 m fortes (trote leve de 2 min entre tiros) · fecha com Prancha com toque alternado de ombro: 2×25s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade articular (ombro, quadril, tornozelo) + ativação de glúteo com o peso do corpo", "ini": "saltos verticais consecutivos (sem pausa) + push press + prancha: 3×6 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "saltos verticais consecutivos (sem pausa) + push press + prancha: 4×8 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "saltos verticais consecutivos (sem pausa) + push press + prancha: 4×11 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Circuito funcional", "aquec": "8-10 min: trote leve + educativos de corrida (skip, elevação de calcanhar) + 3 strides progressivos de 20 m", "ini": "Circuito funcional — 3 voltas: corda (pular) + agachamento + flexão + prancha com toque de ombro — RPE 7-8, descanso só entre voltas", "int": "Circuito funcional — 5 voltas: corda (pular) + agachamento + flexão + prancha com toque de ombro — RPE 7-8, descanso só entre voltas", "adv": "Circuito funcional — 6 voltas: corda (pular) + agachamento + flexão + prancha com toque de ombro — RPE 7-8, descanso só entre voltas"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "Mobilidade dinâmica geral (5 min) + 3 acelerações curtas de 15 m soltas", "ini": "27 min — corrida longa em ritmo controlado, sem olhar o relógio — RPE 3-4, sem pressa", "int": "36 min — corrida longa em ritmo controlado, sem olhar o relógio — RPE 3-4, sem pressa", "adv": "48 min — corrida longa em ritmo controlado, sem olhar o relógio — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: mobilidade geral de tronco (rotações, inclinações laterais) + caminhada leve", "int": "20-30 min: mobilidade geral de tronco (rotações, inclinações laterais) + caminhada leve", "adv": "20-30 min: mobilidade geral de tronco (rotações, inclinações laterais) + caminhada leve"}]}, {"week": 14, "bloco": "Bloco 4 · Pico/Taper", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Rotação de tronco e ombro + agachamento livre lento (2x10) para aquecer as articulações", "ini": "Prancha frontal com expiração forçada a cada 5s (controle respiratório): 3×15s · agachamento livre + afundo alternado: 3×7 · flexão com joelhos apoiados: 3×7 (carga: peso do corpo (sem carga extra))", "int": "Prancha frontal com expiração forçada a cada 5s (controle respiratório): 4×20s · agachamento livre + afundo alternado: 4×10 · flexão de solo completa: 4×10 (carga: halteres leves a moderados)", "adv": "Prancha frontal com expiração forçada a cada 5s (controle respiratório): 4×30s · agachamento livre + afundo alternado: 4×13 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×13 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "Caminhada + trote intercalado (3 min) para elevar a frequência cardíaca aos poucos", "ini": "15 min de corrida fácil + 4 strides soltos de 15m no final (sem forçar) — RPE 3-4, ritmo em que dá pra conversar", "int": "21 min de corrida fácil + 4 strides soltos de 15m no final (sem forçar) — RPE 3-4, ritmo em que dá pra conversar", "adv": "27 min de corrida fácil + 4 strides soltos de 15m no final (sem forçar) — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "6× 200 m fortes (trote leve de 2 min (recuperação quase completa)) · fecha com Prancha frontal com elevação de perna alternada: 2×10s — RPE 8-9 nos tiros", "int": "8× 200 m fortes (trote leve de 2 min (recuperação quase completa)) · fecha com Prancha frontal com elevação de perna alternada: 2×15s — RPE 8-9 nos tiros", "adv": "11× 200 m fortes (trote leve de 2 min (recuperação quase completa)) · fecha com Prancha frontal com elevação de perna alternada: 2×20s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Rotação de tronco e ombro + agachamento livre lento (2x10) para aquecer as articulações", "ini": "bound alternado (passada saltada) + afundo com salto + remada na barra: 3×5 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "bound alternado (passada saltada) + afundo com salto + remada na barra: 4×7 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "bound alternado (passada saltada) + afundo com salto + remada na barra: 4×9 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Tempo run", "aquec": "8 min de trote leve + mobilidade dinâmica de quadril/tornozelo + 3 acelerações de 15-20 m quase máximas", "ini": "Tempo run: 11 min contínuos — ritmo firme e desconfortável, mas sustentável (RPE 6-7)", "int": "Tempo run: 16 min contínuos — ritmo firme e desconfortável, mas sustentável (RPE 6-7)", "adv": "Tempo run: 21 min contínuos — ritmo firme e desconfortável, mas sustentável (RPE 6-7)"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "Caminhada + trote intercalado (3 min) para elevar a frequência cardíaca aos poucos", "ini": "24 min — corrida longa + últimos 400 m no ritmo-alvo do TAF — RPE 3-4, sem pressa", "int": "30 min — corrida longa + últimos 400 m no ritmo-alvo do TAF — RPE 3-4, sem pressa", "adv": "42 min — corrida longa + últimos 400 m no ritmo-alvo do TAF — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: alongamento de peitoral/dorsal (pós-flexão/barra) + caminhada leve", "int": "20-30 min: alongamento de peitoral/dorsal (pós-flexão/barra) + caminhada leve", "adv": "20-30 min: alongamento de peitoral/dorsal (pós-flexão/barra) + caminhada leve"}]}, {"week": 15, "bloco": "Bloco 4 · Pico/Taper", "dias": [{"dia": "Segunda", "sessao": "Prancha isométrica + força geral", "aquec": "Mobilidade dinâmica geral + skips baixos no lugar (30s) para elevar a temperatura corporal", "ini": "Prancha lateral alternando os dois lados sem pausa entre eles: 3×15s · agachamento sumô + afundo lateral: 3×6 · flexão com joelhos apoiados: 3×6 (carga: peso do corpo (sem carga extra))", "int": "Prancha lateral alternando os dois lados sem pausa entre eles: 4×20s · agachamento sumô + afundo lateral: 4×8 · flexão de solo completa: 4×8 (carga: halteres leves a moderados)", "adv": "Prancha lateral alternando os dois lados sem pausa entre eles: 4×25s · agachamento sumô + afundo lateral: 4×11 · flexão de solo com pausa de 1s embaixo ou pés elevados: 4×11 (carga: halteres pesados / maior tempo sob tensão)"}, {"dia": "Terça", "sessao": "Corrida fácil", "aquec": "5 min de mobilidade de quadril/tornozelo + trote leve progressivo", "ini": "12 min de corrida fácil com atenção total à postura e cadência — RPE 3-4, ritmo em que dá pra conversar", "int": "18 min de corrida fácil com atenção total à postura e cadência — RPE 3-4, ritmo em que dá pra conversar", "adv": "24 min de corrida fácil com atenção total à postura e cadência — RPE 3-4, ritmo em que dá pra conversar"}, {"dia": "Quarta", "sessao": "Intervalado + prancha", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "tiros de morro mais longos (50-60s forte) — 7 blocos/tiros (descida trotando + 30s parado) · fecha com Prancha lateral com rotação (thread-the-needle): 2×10s — RPE 8-9 nos tiros", "int": "tiros de morro mais longos (50-60s forte) — 9 blocos/tiros (descida trotando + 30s parado) · fecha com Prancha lateral com rotação (thread-the-needle): 2×10s — RPE 8-9 nos tiros", "adv": "tiros de morro mais longos (50-60s forte) — 12 blocos/tiros (descida trotando + 30s parado) · fecha com Prancha lateral com rotação (thread-the-needle): 2×15s — RPE 8-9 nos tiros"}, {"dia": "Quinta", "sessao": "Força/potência", "aquec": "Mobilidade dinâmica geral + skips baixos no lugar (30s) para elevar a temperatura corporal", "ini": "salto em caixa + sprint de 15 m + prancha: 3×4 cada exercício (carga: peso do corpo (sem carga extra)) — near-falha na última série", "int": "salto em caixa + sprint de 15 m + prancha: 4×6 cada exercício (carga: halteres leves a moderados) — near-falha na última série", "adv": "salto em caixa + sprint de 15 m + prancha: 4×7 cada exercício (carga: halteres pesados / maior tempo sob tensão) — near-falha na última série"}, {"dia": "Sexta", "sessao": "Corrida no ritmo-alvo do TAF", "aquec": "10 min: trote + educativos + 4 strides curtos, aumentando a velocidade a cada um", "ini": "700 m no ritmo-alvo da prova de 2.400 m — foco em manter o pace mesmo em trecho mais cansativo do percurso", "int": "950 m no ritmo-alvo da prova de 2.400 m — foco em manter o pace mesmo em trecho mais cansativo do percurso", "adv": "1300 m no ritmo-alvo da prova de 2.400 m — foco em manter o pace mesmo em trecho mais cansativo do percurso"}, {"dia": "Sábado", "sessao": "Corrida longa fácil", "aquec": "5 min de mobilidade de quadril/tornozelo + trote leve progressivo", "ini": "18 min — corrida longa contínua, mentalizando a prova oficial — RPE 3-4, sem pressa", "int": "27 min — corrida longa contínua, mentalizando a prova oficial — RPE 3-4, sem pressa", "adv": "33 min — corrida longa contínua, mentalizando a prova oficial — RPE 3-4, sem pressa"}, {"dia": "Domingo", "sessao": "Recuperação ativa", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "20-30 min: caminhada leve mais longa (30-35 min), sem exercício estruturado", "int": "20-30 min: caminhada leve mais longa (30-35 min), sem exercício estruturado", "adv": "20-30 min: caminhada leve mais longa (30-35 min), sem exercício estruturado"}]}, {"week": 16, "bloco": "Bloco 4 · Pico/Taper", "dias": [{"dia": "Segunda", "sessao": "Ativação leve", "aquec": "5 min de trote bem solto + mobilidade geral leve", "ini": "15 min corrida bem leve + prancha 2×20s — só soltar o corpo, sem fadiga", "int": "15 min corrida bem leve + prancha 2×20s — só soltar o corpo, sem fadiga", "adv": "15 min corrida bem leve + prancha 2×20s — só soltar o corpo, sem fadiga"}, {"dia": "Terça", "sessao": "Descanso ou caminhada", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "Descanso total ou 20 min de caminhada leve — priorizar sono", "int": "Descanso total ou 20 min de caminhada leve — priorizar sono", "adv": "Descanso total ou 20 min de caminhada leve — priorizar sono"}, {"dia": "Quarta", "sessao": "SIMULADO OFICIAL DO TAF", "aquec": "Protocolo pré-teste: 10 min de trote leve + mobilidade dinâmica completa (ombro, quadril, tornozelo) + 3-4 strides progressivos de 20 m + 2 min de descanso antes da largada", "ini": "Corrida 2.400 m (confortavelmente dentro do seu índice de nota 5 (50 pts)) + Abdominal prancha isométrica (tempo máximo sustentado), com descanso pleno entre as duas provas — registrar os dois tempos e comparar com a tabela de índices", "int": "Corrida 2.400 m (mirando nota 7 (70 pts) na tabela do seu grupo de idade) + Abdominal prancha isométrica (tempo máximo sustentado), com descanso pleno entre as duas provas — registrar os dois tempos e comparar com a tabela de índices", "adv": "Corrida 2.400 m (mirando nota 10 (100 pts) na tabela do seu grupo de idade) + Abdominal prancha isométrica (tempo máximo sustentado), com descanso pleno entre as duas provas — registrar os dois tempos e comparar com a tabela de índices"}, {"dia": "Quinta", "sessao": "Recuperação ativa", "aquec": "5 min de trote bem solto + mobilidade geral leve", "ini": "20 min caminhada leve + mobilidade geral (ombro/lombar/joelho)", "int": "20 min caminhada leve + mobilidade geral (ombro/lombar/joelho)", "adv": "20 min caminhada leve + mobilidade geral (ombro/lombar/joelho)"}, {"dia": "Sexta", "sessao": "Leve/técnica", "aquec": "5 min de caminhada + mobilidade leve de ombro e quadril, sem pressa", "ini": "10-15 min corrida muito leve + técnica de prancha (2×15s, foco só na postura)", "int": "10-15 min corrida muito leve + técnica de prancha (2×15s, foco só na postura)", "adv": "10-15 min corrida muito leve + técnica de prancha (2×15s, foco só na postura)"}, {"dia": "Sábado", "sessao": "Descanso ou leve", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "Descanso total, ou 15-20 min corrida muito leve se preferir manter a rotina", "int": "Descanso total, ou 15-20 min corrida muito leve se preferir manter a rotina", "adv": "Descanso total, ou 15-20 min corrida muito leve se preferir manter a rotina"}, {"dia": "Domingo", "sessao": "Descanso completo", "aquec": "Sem aquecimento estruturado — dia de descanso/recuperação", "ini": "Sem treino — sono e hidratação em prioridade máxima", "int": "Sem treino — sono e hidratação em prioridade máxima", "adv": "Sem treino — sono e hidratação em prioridade máxima"}]}];
+const TAF_TABELAS = {"corrida": {"M": {"18-25": [852, 794, 727, 669, 607, 566], "26-33": [888, 829, 757, 699, 634, 594], "34-39": [926, 867, 802, 743, 693, 645], "40-45": [981, 929, 856, 779, 741, 693], "46-49": [1044, 970, 922, 874, 838, 789], "50+": [1119, 1042, 1000, 958, 933, 884]}, "F": {"18-25": [940, 900, 846, 792, 708, 672], "26-33": [976, 930, 876, 822, 768, 720], "34-39": [1000, 978, 936, 870, 816, 768], "40-45": [1072, 1038, 978, 924, 876, 816], "46-49": [1138, 1098, 1038, 984, 924, 864], "50+": [1204, 1170, 1116, 1050, 1020, 960]}}, "prancha": {"M": {"18-25": [65, 86, 106, 127, 147, 168], "26-33": [60, 81, 101, 121, 141, 161], "34-39": [57, 77, 96, 116, 136, 155], "40-45": [53, 72, 91, 110, 130, 150], "46-49": [50, 69, 88, 107, 126, 146], "50+": [47, 65, 84, 103, 121, 140]}, "F": {"18-25": [56, 76, 96, 116, 136, 156], "26-33": [52, 71, 90, 109, 129, 150], "34-39": [48, 66, 84, 104, 122, 145], "40-45": [45, 62, 81, 98, 115, 139], "46-49": [42, 59, 76, 92, 108, 135], "50+": [38, 58, 76, 94, 112, 129]}}};
+const NIVEL_NOME = {ini:'Iniciante', int:'Intermediário', adv:'Avançado'};
+const TOTAL_SEMANAS = WEEKS.length;
+
+// ---------- gate de NIP ----------
+const NIPS_AUTORIZADOS_HASH = ["efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696"];
+const ADMIN_NIP_HASH = "efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696";
+const ADMIN_SENHA_HASH = "afb2d08ff11f2aa9ccf3833eb900b89b059ca3f9a919334d57d4ea93285cc6db";
+const ACCESS_BIN_ID = "";
+const ACCESS_BIN_KEY = "";
+
+async function sha256Hex(texto){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function registrarAcesso(nip){
+  if (!ACCESS_BIN_ID) return;
+  try {
+    const r = await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID + '/latest');
+    const j = await r.json();
+    const acessos = (j.record && j.record.acessos) ? j.record.acessos : [];
+    acessos.push({nip, ts: new Date().toISOString()});
+    await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json', 'X-Access-Key': ACCESS_BIN_KEY},
+      body: JSON.stringify({acessos})
+    });
+  } catch(e) {}
+}
+
+const nipGate = document.getElementById('nipGate');
+const appContent = document.getElementById('appContent');
+const nipInput = document.getElementById('nipInput');
+const nipErro = document.getElementById('nipErro');
+
+async function tentarEntrar(){
+  const nip = (nipInput.value || '').trim();
+  if (!nip) { nipErro.textContent = 'Informe seu NIP.'; return; }
+  const hash = await sha256Hex(nip);
+  if (NIPS_AUTORIZADOS_HASH.includes(hash)) {
+    nipErro.textContent = '';
+    nipGate.style.display = 'none';
+    appContent.style.display = 'block';
+    registrarAcesso(nip);
+  } else {
+    nipErro.textContent = 'NIP não autorizado. Confira com o responsável pelo programa.';
+  }
+}
+
+document.getElementById('nipEntrarBtn').addEventListener('click', tentarEntrar);
+nipInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarEntrar(); });
+nipInput.focus();
+
+// ---------- admin escondido (?admin na URL) ----------
+if (window.location.search.includes('admin')) {
+  document.getElementById('adminTrigger').style.display = 'block';
+}
+const adminLoginModal = document.getElementById('adminLoginModal');
+const adminPanelModal = document.getElementById('adminPanelModal');
+document.getElementById('adminLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('adminNipInput').value = '';
+  document.getElementById('adminSenhaInput').value = '';
+  document.getElementById('adminLoginErro').textContent = '';
+  adminLoginModal.style.display = 'flex';
+});
+document.getElementById('cancelarAdminLogin').addEventListener('click', () => { adminLoginModal.style.display = 'none'; });
+document.getElementById('fecharAdminPanel').addEventListener('click', () => { adminPanelModal.style.display = 'none'; });
+
+document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+  const nip = (document.getElementById('adminNipInput').value || '').trim();
+  const senha = document.getElementById('adminSenhaInput').value || '';
+  const [nipHash, senhaHash] = await Promise.all([sha256Hex(nip), sha256Hex(senha)]);
+  if (nipHash === ADMIN_NIP_HASH && senhaHash === ADMIN_SENHA_HASH) {
+    adminLoginModal.style.display = 'none';
+    abrirPainelAdmin();
+  } else {
+    document.getElementById('adminLoginErro').textContent = 'NIP ou senha incorretos.';
+  }
+});
+
+async function abrirPainelAdmin(){
+  adminPanelModal.style.display = 'flex';
+  const resumo = document.getElementById('adminResumo');
+  const wrap = document.getElementById('adminLogWrap');
+  resumo.textContent = 'Carregando…';
+  wrap.innerHTML = '';
+  if (!ACCESS_BIN_ID) {
+    resumo.textContent = 'Log de acessos ainda não configurado.';
+    return;
+  }
+  try {
+    const r = await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID + '/latest');
+    const j = await r.json();
+    const acessos = (j.record && j.record.acessos) ? j.record.acessos : [];
+    const nipsUnicos = new Set(acessos.map(a => a.nip));
+    resumo.innerHTML = 'Total de acessos: <b>' + acessos.length + '</b> · NIPs distintos: <b>' + nipsUnicos.size + '</b>';
+    const linhas = acessos.slice().reverse().map(a => {
+      const data = new Date(a.ts);
+      return `<tr><td>${a.nip}</td><td>${data.toLocaleString('pt-BR')}</td></tr>`;
+    }).join('');
+    wrap.innerHTML = `<table class="admin-log-table"><tr><th>NIP</th><th>Data/hora</th></tr>${linhas}</table>`;
+  } catch(e) {
+    resumo.textContent = 'Erro ao carregar o log de acessos.';
+  }
+}
+
+// ---------- frase motivacional do dia ----------
+const FRASES = [
+  {texto:"Venham buscá-las.", autor:"Leônidas I, em Termópilas (segundo Plutarco)"},
+  {texto:"Ou com o escudo, ou sobre ele.", autor:"Ditado espartano (segundo Plutarco, Moralia)"},
+  {texto:"O único dia fácil foi ontem.", autor:"Lema dos Navy SEALs (EUA)"},
+  {texto:"Nunca desista. Nunca, nunca, nunca.", autor:"Winston Churchill, discurso em Harrow School, 1941"},
+  {texto:"Se queres a paz, prepara-te para a guerra.", autor:"Flávio Vegécio, De Re Militari"},
+  {texto:"A vitória pertence aos mais perseverantes.", autor:"Napoleão Bonaparte"},
+  {texto:"Conheça o inimigo e conheça a si mesmo: em cem batalhas, você nunca estará em perigo.", autor:"Sun Tzu, A Arte da Guerra"},
+  {texto:"A oportunidade de vencer é dada pelo próprio inimigo.", autor:"Sun Tzu, A Arte da Guerra"},
+  {texto:"O que fica no caminho torna-se o caminho.", autor:"Marco Aurélio, Meditações"},
+  {texto:"Pare de discutir o que é ser um homem bom. Seja um.", autor:"Marco Aurélio, Meditações"},
+  {texto:"A melhor vingança é não ser como seu inimigo.", autor:"Marco Aurélio, Meditações"},
+  {texto:"Ninguém é livre se não for senhor de si mesmo.", autor:"Epicteto, Enchiridion"},
+  {texto:"Sofremos mais na imaginação do que na realidade.", autor:"Sêneca, Cartas a Lucílio"},
+  {texto:"Não há vento favorável para quem não sabe a que porto se dirige.", autor:"Sêneca, Cartas a Lucílio"},
+];
+
+function diaDoAno(){
+  const agora = new Date();
+  const inicio = new Date(agora.getFullYear(), 0, 0);
+  const diff = agora - inicio;
+  return Math.floor(diff / 86400000);
+}
+
+function renderFraseDia(){
+  const el = document.getElementById('fraseDia');
+  if (!el || !FRASES.length) return;
+  const f = FRASES[diaDoAno() % FRASES.length];
+  el.innerHTML = `<blockquote>${f.texto}</blockquote><cite>${f.autor}</cite>`;
+}
+renderFraseDia();
+
+// ---------- estado ----------
+let nivel = null;
+try { nivel = localStorage.getItem('taf-nivel'); } catch(e) {}
+
+// semanaLiberada = até onde o militar já avançou (teto do que pode ver)
+// semanaView = qual semana está em destaque na tela agora (sempre <= semanaLiberada)
+let semanaLiberada = 1;
+let semanaView = 1;
+try {
+  const liberadaRaw = localStorage.getItem('taf-semana-liberada');
+  const viewRaw = localStorage.getItem('taf-semana-view');
+  if (liberadaRaw) {
+    semanaLiberada = parseInt(liberadaRaw, 10) || 1;
+    semanaView = parseInt(viewRaw, 10) || semanaLiberada;
+  } else {
+    // migração de versão antiga (sem trava) — se existir, usa como ponto de partida
+    const legado = parseInt(localStorage.getItem('taf-semana'), 10);
+    if (legado) { semanaLiberada = legado; semanaView = legado; }
+  }
+} catch(e) {}
+if (semanaLiberada < 1) semanaLiberada = 1;
+if (semanaLiberada > TOTAL_SEMANAS) semanaLiberada = TOTAL_SEMANAS;
+if (semanaView < 1) semanaView = 1;
+if (semanaView > semanaLiberada) semanaView = semanaLiberada;
+
+function salvarSemanaEstado(){
+  try {
+    localStorage.setItem('taf-semana-liberada', String(semanaLiberada));
+    localStorage.setItem('taf-semana-view', String(semanaView));
+  } catch(e) {}
+}
+
+let checks = {};
+try { checks = JSON.parse(localStorage.getItem('taf-checks') || '{}'); } catch(e) { checks = {}; }
+
+function saveChecks(){ try { localStorage.setItem('taf-checks', JSON.stringify(checks)); } catch(e) {} }
+function checkKey(week, dia){ return week + '_' + dia; }
+
+// ---------- nível ----------
+const nivelBar = document.getElementById('nivelBar');
+const nivelOnboard = document.getElementById('nivelOnboard');
+const testeOnboard = document.getElementById('testeOnboard');
+const nivelAtualLabel = document.getElementById('nivelAtualLabel');
+
+// estado de onboarding: 'teste' (calculo automatico, padrao) | 'manual' (escolha manual, fallback) | 'none' (ja tem nivel)
+function setOnboardState(state){
+  testeOnboard.style.display = state === 'teste' ? 'block' : 'none';
+  nivelOnboard.style.display = state === 'manual' ? 'block' : 'none';
+  nivelBar.style.display = state === 'none' ? 'flex' : 'none';
+}
+
+function definirNivel(n){
+  nivel = n;
+  try { localStorage.setItem('taf-nivel', n); } catch(e) {}
+  nivelAtualLabel.textContent = NIVEL_NOME[n];
+  setOnboardState('none');
+  renderSemanas();
+}
+
+document.querySelectorAll('.nivel-opcao').forEach(op => {
+  op.addEventListener('click', () => definirNivel(op.dataset.nivel));
+});
+// trocar nível reabre o teste automático como fluxo principal
+document.getElementById('trocarNivelBtn').addEventListener('click', () => setOnboardState('teste'));
+document.getElementById('pularTesteLink').addEventListener('click', (e) => { e.preventDefault(); setOnboardState('manual'); });
+document.getElementById('voltarTesteLink').addEventListener('click', (e) => { e.preventDefault(); setOnboardState('teste'); });
+
+// ---------- teste inicial: calculo automatico de nota ----------
+let sexoSelecionado = 'M';
+let nivelPendente = null;
+
+document.querySelectorAll('#sexoOpcoes .opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#sexoOpcoes .opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sexoSelecionado = btn.dataset.sexo;
+  });
+});
+
+// interpola a nota (0-100 pts) a partir de um tempo em segundos e da tabela oficial
+// de 6 valores [50,60,70,80,90,100 pts]. decrescente=true (corrida: tempo menor = mais
+// pontos); decrescente=false (prancha: tempo maior sustentado = mais pontos).
+function interpolarPontos(segundos, arr, decrescente){
+  const pts = [50, 60, 70, 80, 90, 100];
+  if (decrescente) {
+    if (segundos <= arr[5]) return 100;
+    if (segundos > arr[0]) return 0; // mais lento que o índice de 50 pts -> abaixo do mínimo
+    for (let i = 0; i < 5; i++) {
+      if (segundos <= arr[i] && segundos >= arr[i + 1]) {
+        const frac = (arr[i] - segundos) / (arr[i] - arr[i + 1]);
+        return pts[i] + frac * (pts[i + 1] - pts[i]);
+      }
+    }
+    return 0;
+  } else {
+    if (segundos >= arr[5]) return 100;
+    if (segundos < arr[0]) return 0; // sustentou menos que o índice de 50 pts -> abaixo do mínimo
+    for (let i = 0; i < 5; i++) {
+      if (segundos >= arr[i] && segundos <= arr[i + 1]) {
+        const frac = (segundos - arr[i]) / (arr[i + 1] - arr[i]);
+        return pts[i] + frac * (pts[i + 1] - pts[i]);
+      }
+    }
+    return 0;
+  }
+}
+
+function calcularPontosCorrida(segundos, arr){ return interpolarPontos(segundos, arr, true); }
+function calcularPontosPrancha(segundos, arr){ return interpolarPontos(segundos, arr, false); }
+
+document.getElementById('calcularTesteBtn').addEventListener('click', () => {
+  const faixa = document.getElementById('faixaEtaria').value;
+  const cMin = parseInt(document.getElementById('corridaMin').value, 10);
+  const cSeg = parseInt(document.getElementById('corridaSeg').value, 10);
+  const pMin = parseInt(document.getElementById('pranchaMin').value, 10);
+  const pSeg = parseInt(document.getElementById('pranchaSeg').value, 10);
+
+  if (isNaN(cMin) || isNaN(cSeg) || isNaN(pMin) || isNaN(pSeg)) {
+    alert('Preencha os dois tempos (corrida e prancha), em minutos e segundos.');
+    return;
+  }
+
+  const corridaSegTotal = cMin * 60 + cSeg;
+  const pranchaSegTotal = pMin * 60 + pSeg;
+  const arrCorrida = TAF_TABELAS.corrida[sexoSelecionado][faixa];
+  const arrPrancha = TAF_TABELAS.prancha[sexoSelecionado][faixa];
+
+  const pontosCorrida = calcularPontosCorrida(corridaSegTotal, arrCorrida);
+  const pontosPrancha = calcularPontosPrancha(pranchaSegTotal, arrPrancha);
+  const notaCorrida = pontosCorrida / 10;
+  const notaPrancha = pontosPrancha / 10;
+  const piorNota = Math.min(notaCorrida, notaPrancha);
+
+  let nivelCalc;
+  if (piorNota < 5) nivelCalc = 'ini';
+  else if (piorNota < 7) nivelCalc = 'int';
+  else nivelCalc = 'adv';
+
+  document.getElementById('notaCorridaOut').textContent = notaCorrida.toFixed(1) + ' (' + Math.round(pontosCorrida) + ' pts)';
+  document.getElementById('notaPranchaOut').textContent = notaPrancha.toFixed(1) + ' (' + Math.round(pontosPrancha) + ' pts)';
+  document.getElementById('nivelCalculadoOut').textContent = NIVEL_NOME[nivelCalc];
+  document.getElementById('resultadoTeste').style.display = 'block';
+  nivelPendente = nivelCalc;
+
+  try {
+    localStorage.setItem('taf-teste-inicial', JSON.stringify({
+      sexo: sexoSelecionado, faixa, corridaSegTotal, pranchaSegTotal,
+      notaCorrida, notaPrancha, nivel: nivelCalc, data: new Date().toISOString()
+    }));
+  } catch(e) {}
+});
+
+document.getElementById('confirmarNivelBtn').addEventListener('click', () => {
+  if (nivelPendente) definirNivel(nivelPendente);
+});
+
+// ---------- semana: pills + prev/next ----------
+const semanaPills = document.getElementById('semanaPills');
+const semanaTitulo = document.getElementById('semanaTitulo');
+
+function pctSemana(week){
+  const w = WEEKS[week - 1];
+  const total = w.dias.length;
+  const done = w.dias.filter(d => checks[checkKey(week, d.dia)]).length;
+  return total ? Math.round(done / total * 100) : 0;
+}
+
+function buildPills(){
+  semanaPills.innerHTML = '';
+  // só mostra pills das semanas já liberadas — as futuras não existem na tela
+  for (let n = 1; n <= semanaLiberada; n++) {
+    const btn = document.createElement('button');
+    btn.textContent = n;
+    btn.dataset.week = n;
+    if (n === semanaView) btn.classList.add('active');
+    if (pctSemana(n) === 100) btn.classList.add('feito');
+    btn.addEventListener('click', () => irParaSemana(n));
+    semanaPills.appendChild(btn);
+  }
+}
+
+function irParaSemana(n){
+  if (n < 1) n = 1;
+  if (n > semanaLiberada) n = semanaLiberada;
+  semanaView = n;
+  salvarSemanaEstado();
+  renderSemanas();
+}
+
+function liberarProximaSemana(){
+  if (semanaLiberada >= TOTAL_SEMANAS) return;
+  semanaLiberada += 1;
+  semanaView = semanaLiberada;
+  salvarSemanaEstado();
+  renderSemanas();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('semanaPrev').addEventListener('click', () => irParaSemana(semanaView - 1));
+document.getElementById('semanaNext').addEventListener('click', () => irParaSemana(semanaView + 1));
+
+// ---------- render das semanas (só o que já foi liberado, semana em foco em destaque) ----------
+const weeksWrap = document.getElementById('weeksWrap');
+const semanaSub = document.getElementById('semanaSub');
+
+function diaTable(week, dias, idPrefix){
+  let rows = dias.map(d => {
+    const presc = nivel ? d[nivel] : d.int;
+    const key = checkKey(week, d.dia);
+    const done = !!checks[key];
+    const isSimulado = /SIMULADO/i.test(d.sessao);
+    return `<tr class="${done ? 'concluida' : ''} ${isSimulado ? 'simulado' : ''}">
+      <td class="chk"><input type="checkbox" data-week="${week}" data-dia="${d.dia}" ${done ? 'checked' : ''}></td>
+      <td class="day-name">${d.dia}</td>
+      <td>${d.sessao}</td>
+      <td>
+        <div class="aquec">🔥 Aquecimento: ${d.aquec}</div>
+        <div class="presc">${presc}</div>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<table class="day-table">
+    <tr><th></th><th>Dia</th><th>Sessão</th><th>Aquecimento + Prescrição</th></tr>
+    ${rows}
+  </table>`;
+}
+
+function renderSemanas(){
+  buildPills();
+  semanaTitulo.textContent = 'Semana ' + semanaView + ' / ' + TOTAL_SEMANAS;
+  semanaSub.textContent = semanaLiberada < TOTAL_SEMANAS
+    ? ('semanas liberadas: 1–' + semanaLiberada)
+    : 'todas as semanas liberadas';
+  document.getElementById('semanaPrev').disabled = semanaView <= 1;
+  document.getElementById('semanaNext').disabled = semanaView >= semanaLiberada;
+
+  weeksWrap.innerHTML = '';
+
+  // semana em foco — card em destaque
+  const wFoco = WEEKS[semanaView - 1];
+  const cardFoco = document.createElement('div');
+  cardFoco.className = 'card gold';
+  cardFoco.innerHTML = `<h2>🎯 Semana ${wFoco.week}${wFoco.week === TOTAL_SEMANAS ? ' · Semana do TAF' : ''} <span class="progresso">${pctSemana(wFoco.week)}%</span></h2>
+    ${diaTable(wFoco.week, wFoco.dias)}`;
+  weeksWrap.appendChild(cardFoco);
+
+  // demais semanas já liberadas — histórico em accordion, mais recente primeiro
+  for (let w = semanaLiberada; w >= 1; w--) {
+    if (w === semanaView) continue;
+    const wk = WEEKS[w - 1];
+    const det = document.createElement('details');
+    det.innerHTML = `<summary>Semana ${wk.week} <span class="progresso">${pctSemana(wk.week)}%</span></summary>
+      <div class="details-body">${diaTable(wk.week, wk.dias)}</div>`;
+    weeksWrap.appendChild(det);
+  }
+
+  // botão de avançar — só quando a semana em foco é a última liberada
+  if (semanaView === semanaLiberada) {
+    if (semanaLiberada < TOTAL_SEMANAS) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-avancar';
+      btn.textContent = '✅ Concluir semana ' + semanaLiberada + ' e liberar semana ' + (semanaLiberada + 1);
+      btn.addEventListener('click', liberarProximaSemana);
+      weeksWrap.appendChild(btn);
+    } else {
+      const badge = document.createElement('div');
+      badge.className = 'fim-badge';
+      badge.textContent = '🏁 Última semana liberada — semana do TAF!';
+      weeksWrap.appendChild(badge);
+    }
+  }
+
+  weeksWrap.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const key = checkKey(e.target.dataset.week, e.target.dataset.dia);
+      checks[key] = e.target.checked;
+      saveChecks();
+      renderSemanas();
+    });
+  });
+}
+
+// ---------- tabs (Treinos / Sobre) ----------
+const tabButtons = document.querySelectorAll('#mainTabs button');
+const panels = document.querySelectorAll('section.panel');
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabButtons.forEach(b => b.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+// ---------- boot ----------
+if (nivel && NIVEL_NOME[nivel]) {
+  nivelAtualLabel.textContent = NIVEL_NOME[nivel];
+  setOnboardState('none');
+} else {
+  setOnboardState('teste');
+}
+renderSemanas();
+</script>
+
+</body>
+</html>
