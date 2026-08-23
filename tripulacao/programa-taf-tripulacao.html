@@ -482,13 +482,31 @@
     justify-content:space-between;
     gap:8px;
   }
-  .card .progresso{
+  .progresso{
     font-family:'Share Tech Mono',monospace;
     color:var(--muted);
     font-size:.7rem;
     text-transform:none;
     letter-spacing:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
   }
+  .mini-bar{
+    width:46px;
+    height:6px;
+    border-radius:3px;
+    background:rgba(255,255,255,.08);
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .mini-bar-fill{
+    display:block;
+    height:100%;
+    border-radius:3px;
+    transition:width .3s ease;
+  }
+  .mini-bar.lg{width:70px;height:8px;}
   table{
     width:100%;
     border-collapse:collapse;
@@ -944,7 +962,7 @@ async function carregarLogAdmin(){
       const p = progresso[nip];
       const nivelTxt = p.nivel && NIVEL_NOME[p.nivel] ? NIVEL_NOME[p.nivel] : '—';
       const atualizado = p.atualizadoEm ? new Date(p.atualizadoEm).toLocaleString('pt-BR') : '—';
-      return `<tr><td>${nip}</td><td>${nivelTxt}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td>${pctProgresso(p)}%</td><td>${atualizado}</td></tr>`;
+      return `<tr><td>${nip}</td><td>${nivelTxt}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td><span class="progresso">${barraProgresso(pctProgresso(p))}</span></td><td>${atualizado}</td></tr>`;
     }).join('');
 
     const linhasAcesso = acessos.slice().reverse().map(a => {
@@ -1163,6 +1181,17 @@ function pctSemana(week){
   return total ? Math.round(done / total * 100) : 0;
 }
 
+function corPct(pct){
+  if (pct >= 80) return 'var(--khaki)';
+  if (pct >= 40) return 'var(--amber)';
+  return 'var(--danger)';
+}
+
+function barraProgresso(pct, tamanho){
+  const cls = tamanho === 'lg' ? 'mini-bar lg' : 'mini-bar';
+  return `<span class="${cls}"><span class="mini-bar-fill" style="width:${pct}%;background:${corPct(pct)}"></span></span><span>${pct}%</span>`;
+}
+
 function buildPills(){
   semanaPills.innerHTML = '';
   // só mostra pills das semanas já liberadas — as futuras não existem na tela
@@ -1239,7 +1268,7 @@ function renderSemanas(){
   const wFoco = WEEKS[semanaView - 1];
   const cardFoco = document.createElement('div');
   cardFoco.className = 'card gold';
-  cardFoco.innerHTML = `<h2>🎯 Semana ${wFoco.week}${wFoco.week === TOTAL_SEMANAS ? ' · Semana do TAF' : ''} <span class="progresso">${pctSemana(wFoco.week)}%</span></h2>
+  cardFoco.innerHTML = `<h2>🎯 Semana ${wFoco.week}${wFoco.week === TOTAL_SEMANAS ? ' · Semana do TAF' : ''} <span class="progresso">${barraProgresso(pctSemana(wFoco.week), 'lg')}</span></h2>
     ${diaTable(wFoco.week, wFoco.dias)}`;
   weeksWrap.appendChild(cardFoco);
 
@@ -1248,7 +1277,7 @@ function renderSemanas(){
     if (w === semanaView) continue;
     const wk = WEEKS[w - 1];
     const det = document.createElement('details');
-    det.innerHTML = `<summary>Semana ${wk.week} <span class="progresso">${pctSemana(wk.week)}%</span></summary>
+    det.innerHTML = `<summary>Semana ${wk.week} <span class="progresso">${barraProgresso(pctSemana(wk.week))}</span></summary>
       <div class="details-body">${diaTable(wk.week, wk.dias)}</div>`;
     weeksWrap.appendChild(det);
   }
