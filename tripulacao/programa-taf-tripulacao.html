@@ -314,69 +314,7 @@
     min-height:1em;
   }
 
-  /* ---- admin: gatilho escondido + modais ---- */
-  #adminTrigger{
-    text-align:center;
-    padding:4px 0 0;
-  }
-  #adminTrigger a{
-    color:var(--border);
-    font-size:.62rem;
-    text-decoration:none;
-  }
-  .admin-modal-bg{
-    position:fixed;
-    inset:0;
-    z-index:200;
-    background:rgba(10,20,32,.9);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  }
-  .admin-modal{
-    max-width:420px;
-    width:100%;
-    max-height:82vh;
-    overflow-y:auto;
-    background:var(--card);
-    border:1px solid var(--border);
-    border-left:4px solid var(--accent);
-    border-radius:10px;
-    padding:22px;
-  }
-  .admin-modal h2{
-    font-family:'Black Ops One',sans-serif;
-    color:var(--khaki);
-    font-size:.92rem;
-    text-transform:uppercase;
-    margin:0 0 14px;
-    text-align:center;
-  }
-  .admin-modal input{
-    width:100%;
-    background:var(--bg);
-    color:var(--ink);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:11px;
-    font-family:inherit;
-    font-size:.9rem;
-    margin-bottom:10px;
-  }
-  .admin-modal button{
-    background:var(--accent);
-    color:#eef4f9;
-    border:none;
-    border-radius:8px;
-    padding:10px 16px;
-    font-family:'Black Ops One',sans-serif;
-    font-size:.72rem;
-    text-transform:uppercase;
-    cursor:pointer;
-    margin-right:8px;
-  }
-  .admin-modal button.fechar{background:var(--steel);}
+  /* ---- admin: log de acessos (aba interna) ---- */
   .admin-resumo{
     color:var(--muted);
     font-size:.78rem;
@@ -724,6 +662,7 @@
 <nav class="tabs" id="mainTabs">
   <button data-tab="treinos" class="active">Treinos</button>
   <button data-tab="sobre">Sobre</button>
+  <button data-tab="admin" id="adminTabBtn" style="display:none;">Acessos</button>
 </nav>
 
 <main>
@@ -830,34 +769,19 @@
 
 </section>
 
+<!-- ADMIN (visível só para o NIP admin, aba revelada dinamicamente) -->
+<section class="panel" id="admin">
+  <div class="card gold">
+    <h2>📋 Log de acessos</h2>
+    <div class="admin-resumo" id="adminResumo">Carregando…</div>
+    <div id="adminLogWrap"></div>
+  </div>
+</section>
+
 </main>
 
 <footer>Programa genérico de preparação física — referência de treino, não substitui avaliação médica/profissional de educação física individualizada.<br>Criado e desenvolvido pelo 2T JARDIM</footer>
 
-</div>
-
-<div id="adminTrigger" style="display:none;"><a href="#" id="adminLink">admin</a></div>
-
-<div class="admin-modal-bg" id="adminLoginModal" style="display:none;">
-  <div class="admin-modal">
-    <h2>Painel admin</h2>
-    <input type="text" id="adminNipInput" inputmode="numeric" placeholder="NIP" autocomplete="off">
-    <input type="password" id="adminSenhaInput" placeholder="Senha" autocomplete="off">
-    <div>
-      <button type="button" id="adminLoginBtn">Entrar</button>
-      <button type="button" class="fechar" id="cancelarAdminLogin">Cancelar</button>
-    </div>
-    <div class="nip-erro" id="adminLoginErro"></div>
-  </div>
-</div>
-
-<div class="admin-modal-bg" id="adminPanelModal" style="display:none;">
-  <div class="admin-modal">
-    <h2>Log de acessos</h2>
-    <div class="admin-resumo" id="adminResumo">Carregando…</div>
-    <div id="adminLogWrap"></div>
-    <button type="button" class="fechar" id="fecharAdminPanel">Fechar</button>
-  </div>
 </div>
 
 <script>
@@ -869,7 +793,6 @@ const TOTAL_SEMANAS = WEEKS.length;
 // ---------- gate de NIP ----------
 const NIPS_AUTORIZADOS_HASH = ["efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696"];
 const ADMIN_NIP_HASH = "efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696";
-const ADMIN_SENHA_HASH = "afb2d08ff11f2aa9ccf3833eb900b89b059ca3f9a919334d57d4ea93285cc6db";
 const ACCESS_BIN_ID = "";
 const ACCESS_BIN_KEY = "";
 
@@ -906,6 +829,9 @@ async function tentarEntrar(){
     nipErro.textContent = '';
     nipGate.style.display = 'none';
     appContent.style.display = 'block';
+    if (hash === ADMIN_NIP_HASH) {
+      document.getElementById('adminTabBtn').style.display = '';
+    }
     registrarAcesso(nip);
   } else {
     nipErro.textContent = 'NIP não autorizado. Confira com o responsável pelo programa.';
@@ -916,36 +842,8 @@ document.getElementById('nipEntrarBtn').addEventListener('click', tentarEntrar);
 nipInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarEntrar(); });
 nipInput.focus();
 
-// ---------- admin escondido (?admin na URL) ----------
-if (window.location.search.includes('admin')) {
-  document.getElementById('adminTrigger').style.display = 'block';
-}
-const adminLoginModal = document.getElementById('adminLoginModal');
-const adminPanelModal = document.getElementById('adminPanelModal');
-document.getElementById('adminLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  document.getElementById('adminNipInput').value = '';
-  document.getElementById('adminSenhaInput').value = '';
-  document.getElementById('adminLoginErro').textContent = '';
-  adminLoginModal.style.display = 'flex';
-});
-document.getElementById('cancelarAdminLogin').addEventListener('click', () => { adminLoginModal.style.display = 'none'; });
-document.getElementById('fecharAdminPanel').addEventListener('click', () => { adminPanelModal.style.display = 'none'; });
-
-document.getElementById('adminLoginBtn').addEventListener('click', async () => {
-  const nip = (document.getElementById('adminNipInput').value || '').trim();
-  const senha = document.getElementById('adminSenhaInput').value || '';
-  const [nipHash, senhaHash] = await Promise.all([sha256Hex(nip), sha256Hex(senha)]);
-  if (nipHash === ADMIN_NIP_HASH && senhaHash === ADMIN_SENHA_HASH) {
-    adminLoginModal.style.display = 'none';
-    abrirPainelAdmin();
-  } else {
-    document.getElementById('adminLoginErro').textContent = 'NIP ou senha incorretos.';
-  }
-});
-
-async function abrirPainelAdmin(){
-  adminPanelModal.style.display = 'flex';
+// ---------- admin: log de acessos (reconhecido automaticamente pelo NIP) ----------
+async function carregarLogAdmin(){
   const resumo = document.getElementById('adminResumo');
   const wrap = document.getElementById('adminLogWrap');
   resumo.textContent = 'Carregando…';
@@ -1295,6 +1193,7 @@ tabButtons.forEach(btn => {
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
     window.scrollTo({top:0, behavior:'smooth'});
+    if (btn.dataset.tab === 'admin') carregarLogAdmin();
   });
 });
 
