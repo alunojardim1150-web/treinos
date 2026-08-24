@@ -7,6 +7,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/f45-icon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/f45-icon-512.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/f45-icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1420">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap');
   :root{
@@ -62,6 +64,77 @@
     padding:16px 8px !important;
     font-style:italic;
   }
+
+  /* ---- badge de nível (cor por trilha) ---- */
+  .nivel-badge{
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:10px;
+    font-size:.62rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    font-weight:700;
+  }
+  .nivel-badge.ini{background:rgba(94,156,122,.15);color:#5e9c7a;}
+  .nivel-badge.int{background:rgba(47,127,176,.15);color:var(--accent);}
+  .nivel-badge.adv{background:rgba(201,162,39,.15);color:var(--khaki);}
+  .nivel-bar b.ini{color:#5e9c7a;}
+  .nivel-bar b.int{color:var(--accent);}
+  .nivel-bar b.adv{color:var(--khaki);}
+
+  /* ---- progresso geral do programa ---- */
+  .progresso-geral{
+    max-width:720px;
+    margin:0 auto 10px;
+    padding:10px 14px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    font-size:.74rem;
+    color:var(--muted);
+  }
+  .progresso-geral b{color:var(--khaki);}
+
+  /* ---- botão secundário (ex: exportar CSV) ---- */
+  .btn-secundario{
+    display:block;
+    width:100%;
+    margin-top:14px;
+    background:transparent;
+    color:var(--khaki);
+    border:1px solid var(--khaki);
+    border-radius:8px;
+    padding:10px 14px;
+    font-family:'Black Ops One',sans-serif;
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    cursor:pointer;
+  }
+  .btn-secundario:hover{background:rgba(201,162,39,.1);}
+  .btn-secundario:active{transform:scale(.98);}
+
+  /* ---- dia atual em destaque ---- */
+  tr.hoje td{background:rgba(201,162,39,.07);}
+  tr.hoje td.day-name{color:var(--khaki);}
+  tr.hoje td.day-name::after{
+    content:' • hoje';
+    font-size:.6rem;
+    color:var(--khaki);
+    text-transform:uppercase;
+    font-weight:400;
+  }
+
+  /* ---- animação ao concluir ---- */
+  @keyframes rowDone{
+    0%{background:rgba(94,156,122,.25);}
+    100%{background:transparent;}
+  }
+  tr.concluida{animation:rowDone .6s ease;}
 
   body{
     margin:0;
@@ -814,6 +887,8 @@
     <div class="semana-sub" id="semanaSub"></div>
   </div>
 
+  <div class="progresso-geral" id="progressoGeral"></div>
+
   <div id="weeksWrap"></div>
 
 </section>
@@ -909,6 +984,7 @@
     <h2>📋 Log de acessos</h2>
     <div class="admin-resumo" id="adminResumo"><span class="spinner"></span>Carregando…</div>
     <div id="adminLogWrap"></div>
+    <button id="exportarCsvBtn" class="btn-secundario" type="button" style="display:none;">⬇ Exportar CSV</button>
   </div>
 </section>
 
@@ -1050,11 +1126,15 @@ nipInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tentarEntra
 nipInput.focus();
 
 // ---------- admin: log de acessos + progresso (reconhecido automaticamente pelo NIP) ----------
+let ultimoLogRec = null;
+
 async function carregarLogAdmin(){
   const resumo = document.getElementById('adminResumo');
   const wrap = document.getElementById('adminLogWrap');
+  const btnCsv = document.getElementById('exportarCsvBtn');
   resumo.innerHTML = '<span class="spinner"></span>Carregando…';
   wrap.innerHTML = '';
+  btnCsv.style.display = 'none';
   if (!ACCESS_BIN_ID) {
     resumo.textContent = 'Log de acessos ainda não configurado.';
     return;
@@ -1063,14 +1143,14 @@ async function carregarLogAdmin(){
     const rec = await fetchBin();
     const acessos = rec.acessos;
     const progresso = rec.progresso;
+    ultimoLogRec = rec;
     const nipsUnicos = new Set(acessos.map(a => a.nip));
     resumo.innerHTML = 'Total de acessos: <b>' + acessos.length + '</b> · NIPs distintos: <b>' + nipsUnicos.size + '</b>';
 
     const linhasProgresso = Object.keys(progresso).map(nip => {
       const p = progresso[nip];
-      const nivelTxt = p.nivel && NIVEL_NOME[p.nivel] ? NIVEL_NOME[p.nivel] : '—';
       const atualizado = p.atualizadoEm ? new Date(p.atualizadoEm).toLocaleString('pt-BR') : '—';
-      return `<tr><td>${nip}</td><td>${nivelTxt}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td><span class="progresso">${barraProgresso(pctProgresso(p))}</span></td><td>${atualizado}</td></tr>`;
+      return `<tr><td>${nip}</td><td>${badgeNivel(p.nivel)}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td><span class="progresso">${barraProgresso(pctProgresso(p))}</span></td><td>${atualizado}</td></tr>`;
     }).join('');
 
     const linhasAcesso = acessos.slice().reverse().map(a => {
@@ -1083,10 +1163,45 @@ async function carregarLogAdmin(){
       `<table class="admin-log-table"><tr><th>NIP</th><th>Nível</th><th>Semana</th><th>Concluído</th><th>Atualizado</th></tr>${linhasProgresso || '<tr><td colspan="5" class="empty-cell">Nenhum progresso sincronizado ainda.</td></tr>'}</table>` +
       '<h3 class="admin-subtitulo">Histórico de acessos</h3>' +
       `<table class="admin-log-table"><tr><th>NIP</th><th>Data/hora</th></tr>${linhasAcesso || '<tr><td colspan="2" class="empty-cell">Nenhum acesso registrado ainda.</td></tr>'}</table>`;
+
+    if (acessos.length || Object.keys(progresso).length) btnCsv.style.display = 'block';
   } catch(e) {
     resumo.innerHTML = '<span style="color:var(--danger)">⚠ Erro ao carregar o log de acessos.</span>';
   }
 }
+
+function csvEscape(v){
+  const s = String(v == null ? '' : v);
+  return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function montarCsv(rec){
+  const linhas = [['Tipo','NIP','Nível','Semana liberada','Concluído (%)','Atualizado em','Data/hora do acesso'].map(csvEscape).join(';')];
+  Object.keys(rec.progresso).forEach(nip => {
+    const p = rec.progresso[nip];
+    const nivelTxt = p.nivel && NIVEL_NOME[p.nivel] ? NIVEL_NOME[p.nivel] : '';
+    const atualizado = p.atualizadoEm ? new Date(p.atualizadoEm).toLocaleString('pt-BR') : '';
+    linhas.push(['Progresso', nip, nivelTxt, p.semanaLiberada || 1, pctProgresso(p), atualizado, ''].map(csvEscape).join(';'));
+  });
+  rec.acessos.forEach(a => {
+    linhas.push(['Acesso', a.nip, '', '', '', '', new Date(a.ts).toLocaleString('pt-BR')].map(csvEscape).join(';'));
+  });
+  return linhas.join('\n');
+}
+
+document.getElementById('exportarCsvBtn').addEventListener('click', () => {
+  if (!ultimoLogRec) return;
+  const csv = '﻿' + montarCsv(ultimoLogRec);
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'taf-tripulacao-log-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
 
 // ---------- frase motivacional do dia ----------
 const FRASES = [
@@ -1172,10 +1287,16 @@ function setOnboardState(state){
   nivelBar.style.display = state === 'none' ? 'flex' : 'none';
 }
 
+function badgeNivel(n){
+  if (!n || !NIVEL_NOME[n]) return '—';
+  return `<span class="nivel-badge ${n}">${NIVEL_NOME[n]}</span>`;
+}
+
 function definirNivel(n){
   nivel = n;
   try { localStorage.setItem('taf-nivel', n); } catch(e) {}
   nivelAtualLabel.textContent = NIVEL_NOME[n];
+  nivelAtualLabel.className = n;
   setOnboardState('none');
   renderSemanas();
   agendarSyncProgresso();
@@ -1339,16 +1460,32 @@ document.getElementById('semanaNext').addEventListener('click', () => irParaSema
 const weeksWrap = document.getElementById('weeksWrap');
 const semanaSub = document.getElementById('semanaSub');
 
-function diaTable(week, dias, idPrefix){
+// ícone por tipo de sessão, a partir de palavras-chave no texto (sem campo estruturado de tipo)
+function iconeSessao(sessao){
+  const s = sessao.toUpperCase();
+  if (/SIMULADO/.test(s)) return '🎖️';
+  if (/DESCANSO/.test(s)) return '😴';
+  if (/CORRIDA|TEMPO RUN|INTERVALADO/.test(s)) return '🏃';
+  if (/FORÇA|POTÊNCIA|PRANCHA|CIRCUITO/.test(s)) return '🏋️';
+  if (/RECUPERAÇÃO|ATIVAÇÃO|LEVE/.test(s)) return '🧘';
+  return '💪';
+}
+
+const DIAS_SEMANA = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+function diaSemanaHoje(){ return DIAS_SEMANA[new Date().getDay()]; }
+
+function diaTable(week, dias, idPrefix, destacarHoje){
+  const hoje = destacarHoje ? diaSemanaHoje() : null;
   let rows = dias.map(d => {
     const presc = nivel ? d[nivel] : d.int;
     const key = checkKey(week, d.dia);
     const done = !!checks[key];
     const isSimulado = /SIMULADO/i.test(d.sessao);
-    return `<tr class="${done ? 'concluida' : ''} ${isSimulado ? 'simulado' : ''}">
+    const isHoje = hoje && d.dia === hoje;
+    return `<tr class="${done ? 'concluida' : ''} ${isSimulado ? 'simulado' : ''} ${isHoje ? 'hoje' : ''}">
       <td class="chk"><input type="checkbox" data-week="${week}" data-dia="${d.dia}" ${done ? 'checked' : ''}></td>
       <td class="day-name">${d.dia}</td>
-      <td>${d.sessao}</td>
+      <td>${iconeSessao(d.sessao)} ${d.sessao}</td>
       <td>
         <div class="aquec">🔥 Aquecimento: ${d.aquec}</div>
         <div class="presc">${presc}</div>
@@ -1361,6 +1498,17 @@ function diaTable(week, dias, idPrefix){
   </table>`;
 }
 
+function pctGeral(){
+  let total = 0, done = 0;
+  WEEKS.forEach(w => {
+    w.dias.forEach(d => {
+      total++;
+      if (checks[checkKey(w.week, d.dia)]) done++;
+    });
+  });
+  return {done, total, pct: total ? Math.round(done / total * 100) : 0};
+}
+
 function renderSemanas(){
   buildPills();
   semanaTitulo.textContent = 'Semana ' + semanaView + ' / ' + TOTAL_SEMANAS;
@@ -1370,6 +1518,10 @@ function renderSemanas(){
   document.getElementById('semanaPrev').disabled = semanaView <= 1;
   document.getElementById('semanaNext').disabled = semanaView >= semanaLiberada;
 
+  const pg = pctGeral();
+  document.getElementById('progressoGeral').innerHTML =
+    `<span>Progresso geral do programa:</span> <span class="progresso">${barraProgresso(pg.pct, 'lg')}</span> <span>(${pg.done}/${pg.total} dias)</span>`;
+
   weeksWrap.innerHTML = '';
 
   // semana em foco — card em destaque
@@ -1377,7 +1529,7 @@ function renderSemanas(){
   const cardFoco = document.createElement('div');
   cardFoco.className = 'card gold';
   cardFoco.innerHTML = `<h2>🎯 Semana ${wFoco.week}${wFoco.week === TOTAL_SEMANAS ? ' · Semana do TAF' : ''} <span class="progresso">${barraProgresso(pctSemana(wFoco.week), 'lg')}</span></h2>
-    ${diaTable(wFoco.week, wFoco.dias)}`;
+    ${diaTable(wFoco.week, wFoco.dias, null, true)}`;
   weeksWrap.appendChild(cardFoco);
 
   // demais semanas já liberadas — histórico em accordion, mais recente primeiro
@@ -1434,11 +1586,19 @@ tabButtons.forEach(btn => {
 // ---------- boot ----------
 if (nivel && NIVEL_NOME[nivel]) {
   nivelAtualLabel.textContent = NIVEL_NOME[nivel];
+  nivelAtualLabel.className = nivel;
   setOnboardState('none');
 } else {
   setOnboardState('teste');
 }
 renderSemanas();
+
+// ---------- PWA: registra o service worker (cache do shell p/ uso offline) ----------
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 
 </body>

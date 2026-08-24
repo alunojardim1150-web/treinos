@@ -1,0 +1,29 @@
+{
+  "name": "Programa TAF - F45 - Tripulação",
+  "short_name": "TAF F45",
+  "description": "Programa de preparação física da tripulação para o TAF",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a1420",
+  "theme_color": "#0a1420",
+  "icons": [
+    {
+      "src": "assets/f45-icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/f45-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/f45-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
