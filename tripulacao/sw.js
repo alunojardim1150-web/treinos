@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taf-f45-v1';
+const CACHE_NAME = 'taf-f45-v2';
 const SHELL = [
   './',
   './index.html',
