@@ -317,6 +317,7 @@
     font-family:var(--title);color:var(--khaki);font-size:1.7rem;
     text-transform:uppercase;letter-spacing:.03em;margin-top:4px;
   }
+  .boas-vindas .bv-voc{color:var(--khaki);font-weight:700;}
   .boas-vindas .bv-sub{
     color:var(--muted-2);font-size:.64rem;text-transform:uppercase;
     letter-spacing:.18em;margin-top:16px;
@@ -880,7 +881,16 @@ function mostrarBoasVindas(militar){
   document.getElementById('bvGrad').textContent = militar.postoGrad;
   document.getElementById('bvNome').textContent = militar.nome;
   // vocativo: cargo de destaque (coluna vocativo do militares.csv) ou, na falta, o nome de guerra
-  document.getElementById('bvSub').textContent = 'Bem-vindo a bordo, ' + (militar.vocativo || militar.nome);
+  const bvSub = document.getElementById('bvSub');
+  bvSub.textContent = 'Bem-vindo a bordo, ';
+  if (militar.vocativo) {
+    const voc = document.createElement('span');
+    voc.className = 'bv-voc';  // função de destaque na cor do nome (khaki)
+    voc.textContent = militar.vocativo;
+    bvSub.appendChild(voc);
+  } else {
+    bvSub.appendChild(document.createTextNode(militar.nome));
+  }
   bv.classList.remove('fade-out');
   bv.style.display = 'flex';
   setTimeout(() => { bv.classList.add('fade-out'); }, 1500);
