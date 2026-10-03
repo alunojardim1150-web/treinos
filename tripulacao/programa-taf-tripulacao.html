@@ -886,7 +886,7 @@ function mostrarBoasVindas(militar){
 }
 
 async function tentarEntrar(){
-  const nip = (nipInput.value || '').replace(/\D/g, '');  // aceita 18.0108.22 ou 18010822
+  const nip = (nipInput.value || '').replace(/\D/g, '');  // aceita NIP com ou sem pontos
   if (!nip) { nipErro.textContent = 'Informe seu NIP.'; return; }
   const hash = await sha256Hex(nip);
   if (NIPS_AUTORIZADOS_HASH.includes(hash)) {
