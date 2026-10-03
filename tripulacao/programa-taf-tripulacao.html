@@ -299,7 +299,7 @@
   }
   .nip-card button:hover{filter:brightness(1.08);}
   .nip-card button:active{transform:scale(.985);}
-  .nip-erro{color:var(--danger);font-size:.72rem;margin-top:12px;min-height:1em;}
+  .nip-erro{color:var(--danger);font-size:.72rem;margin-top:12px;min-height:1em;} .boas-vindas{position:fixed;inset:0;z-index:150;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px;opacity:1;transition:opacity .6s ease;} .boas-vindas.fade-out{opacity:0;pointer-events:none;} .boas-vindas .bv-grad{font-family:var(--mono);color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.22em;} .boas-vindas .bv-nome{font-family:var(--title);color:var(--khaki);font-size:1.7rem;text-transform:uppercase;letter-spacing:.03em;margin-top:4px;} .boas-vindas .bv-sub{color:var(--muted-2);font-size:.64rem;text-transform:uppercase;letter-spacing:.18em;margin-top:16px;}
 
   /* ---- admin ---- */
   .admin-resumo{color:var(--muted-2);font-size:.74rem;margin-bottom:14px;}
@@ -464,7 +464,7 @@
   </div>
 </div>
 
-<div id="appContent" style="display:none;">
+<div class="boas-vindas" id="boasVindas" style="display:none;"><div class="bv-grad" id="bvGrad"></div><div class="bv-nome" id="bvNome"></div><div class="bv-sub">Bem-vindo a bordo</div></div><div id="appContent" style="display:none;">
 
 <header>
   <h1>PROGRAMA TAF - F45</h1>
@@ -686,7 +686,7 @@ const TOTAL_SEMANAS = WEEKS.length;
 
 // ---------- gate de NIP ----------
 const NIPS_AUTORIZADOS_HASH = ["efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696"];
-const ADMIN_NIP_HASH = "efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696";
+const ADMIN_NIP_HASH = "efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696"; const MILITARES_HASH = {"efca229960247d7a5fe11bfffbc16d2d420c63d98c09fe6d2e2c5598b7765696": {"nome": "Jardim", "postoGrad": "Segundo Tenente"}};
 const ACCESS_BIN_ID = "6a8a48b9f5f4af5e2936ffac";
 const ACCESS_BIN_KEY = "$2a$10$DFLtfigVrve9XJbArlXkMO7Z4nQA2eQ/i2BCADya8z81YKS7Vx80S";
 let nipAtual = null; const STRAVA_WORKER = "https://taf-strava.taf-f45-hugo.workers.dev";
@@ -787,14 +787,14 @@ const appContent = document.getElementById('appContent');
 const nipInput = document.getElementById('nipInput');
 const nipErro = document.getElementById('nipErro');
 
-async function tentarEntrar(){
+function mostrarBoasVindas(militar){ const bv = document.getElementById('boasVindas'); document.getElementById('bvGrad').textContent = militar.postoGrad; document.getElementById('bvNome').textContent = militar.nome; bv.classList.remove('fade-out'); bv.style.display = 'flex'; setTimeout(() => { bv.classList.add('fade-out'); }, 1500); setTimeout(() => { bv.style.display = 'none'; }, 2100); } async function tentarEntrar(){
   const nip = (nipInput.value || '').trim();
   if (!nip) { nipErro.textContent = 'Informe seu NIP.'; return; }
   const hash = await sha256Hex(nip);
   if (NIPS_AUTORIZADOS_HASH.includes(hash)) {
     nipErro.textContent = '';
     nipGate.style.display = 'none';
-    appContent.style.display = 'block';
+    appContent.style.display = 'block'; const militar = MILITARES_HASH[hash]; if (militar) mostrarBoasVindas(militar);
     if (hash === ADMIN_NIP_HASH) {
       document.getElementById('adminTabBtn').style.display = '';
     }
