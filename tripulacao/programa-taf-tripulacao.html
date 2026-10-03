@@ -756,6 +756,8 @@
     <div class="admin-resumo" id="adminResumo"><span class="spinner"></span>Carregando…</div>
     <div id="adminLogWrap"></div>
     <button id="exportarCsvBtn" class="btn-secundario" type="button" style="display:none;">⬇ Exportar CSV</button>
+    <button id="zerarPerfisBtn" class="btn-secundario" type="button">Zerar progresso dos demais militares</button>
+    <div class="admin-resumo" id="zerarPerfisMsg"></div>
   </div>
 </section>
 
@@ -787,16 +789,17 @@ async function sha256Hex(texto){
 
 // ---------- helpers de sync no bin (acessos + progresso, mesmo documento) ----------
 async function fetchBin(){
-  if (!ACCESS_BIN_ID) return {acessos:[], progresso:{}};
+  if (!ACCESS_BIN_ID) return {acessos:[], progresso:{}, ok:false};
   try {
     const r = await fetch('https://api.jsonbin.io/v3/b/' + ACCESS_BIN_ID + '/latest', {
       headers: {'X-Access-Key': ACCESS_BIN_KEY}
     });
     const j = await r.json();
     const rec = j.record || {};
-    return {acessos: rec.acessos || [], progresso: rec.progresso || {}};
+    if (!r.ok) return {acessos:[], progresso:{}, ok:false};
+    return {acessos: rec.acessos || [], progresso: rec.progresso || {}, ok:true};
   } catch(e) {
-    return {acessos:[], progresso:{}};
+    return {acessos:[], progresso:{}, ok:false};
   }
 }
 
@@ -818,28 +821,53 @@ async function registrarAcesso(nip){
   await putBin(rec);
 }
 
+// O estado local (localStorage) é do APARELHO, não do militar. Para não misturar perfis
+// quando mais de um NIP entra no mesmo celular, o estado local só vale para o último NIP
+// que entrou neste aparelho; trocando de NIP, começa do zero e busca o progresso dele no bin.
+const CHAVES_ESTADO_LOCAL = ['taf-nivel','taf-semana-liberada','taf-semana-view','taf-checks','taf-semana','taf-teste-inicial'];
+function resetEstadoLocal(){
+  nivel = null; semanaLiberada = 1; semanaView = 1; checks = {};
+  try { CHAVES_ESTADO_LOCAL.forEach(k => localStorage.removeItem(k)); } catch(e) {}
+}
+function aplicarEstadoNaTela(){
+  if (nivel && NIVEL_NOME[nivel]) {
+    nivelAtualLabel.textContent = NIVEL_NOME[nivel];
+    nivelAtualLabel.className = nivel;
+    setOnboardState('none');
+  } else {
+    nivelAtualLabel.textContent = '—';
+    nivelAtualLabel.className = '';
+    setOnboardState('teste');
+  }
+  renderSemanas();
+}
+
 // ---------- progresso sincronizado por NIP (checks + semana + nível) ----------
-async function hidratarProgresso(nip){
-  nipAtual = nip;
-  if (!ACCESS_BIN_ID) return;
+async function hidratarProgresso(nip, hash){
+  nipAtual = null;  // bloqueia sync até o progresso deste NIP estar carregado
+  let ultimo = null;
+  try { ultimo = localStorage.getItem('taf-ultimo-nip-hash'); } catch(e) {}
+  if (ultimo !== hash) {
+    resetEstadoLocal();
+    try { localStorage.setItem('taf-ultimo-nip-hash', hash); } catch(e) {}
+  }
+  aplicarEstadoNaTela();
   const rec = await fetchBin();
+  nipAtual = nip;
+  if (!rec.ok) return;              // sem rede: segue com o estado local (que é deste NIP)
   const p = rec.progresso[nip];
-  if (!p) return;
-  if (p.nivel) nivel = p.nivel;
-  if (p.semanaLiberada) semanaLiberada = Math.min(Math.max(p.semanaLiberada, 1), TOTAL_SEMANAS);
-  if (p.semanaView) semanaView = Math.min(Math.max(p.semanaView, 1), semanaLiberada);
-  if (p.checks) checks = p.checks;
+  if (!p) return;                   // militar novo: começa do zero (teste de nível)
+  nivel = (p.nivel && NIVEL_NOME[p.nivel]) ? p.nivel : null;
+  semanaLiberada = Math.min(Math.max(p.semanaLiberada || 1, 1), TOTAL_SEMANAS);
+  semanaView = Math.min(Math.max(p.semanaView || semanaLiberada, 1), semanaLiberada);
+  checks = p.checks || {};
   try {
-    if (nivel) localStorage.setItem('taf-nivel', nivel);
+    if (nivel) localStorage.setItem('taf-nivel', nivel); else localStorage.removeItem('taf-nivel');
     localStorage.setItem('taf-semana-liberada', String(semanaLiberada));
     localStorage.setItem('taf-semana-view', String(semanaView));
     localStorage.setItem('taf-checks', JSON.stringify(checks));
   } catch(e) {}
-  if (nivel && NIVEL_NOME[nivel]) {
-    nivelAtualLabel.textContent = NIVEL_NOME[nivel];
-    setOnboardState('none');
-  }
-  renderSemanas();
+  aplicarEstadoNaTela();
 }
 
 let syncProgressoTimer = null;
@@ -911,7 +939,7 @@ async function tentarEntrar(){
       document.getElementById('adminTabBtn').style.display = '';
     }
     registrarAcesso(nip);
-    hidratarProgresso(nip);
+    hidratarProgresso(nip, hash);
     carregarStrava(nip);
   } else {
     nipErro.textContent = 'NIP não autorizado. Confira com o responsável pelo programa.';
@@ -1131,6 +1159,32 @@ stravaDesconectarBtn.addEventListener('click', async () => {
   } catch (e) {}
   stravaDesconectarBtn.disabled = false;
   carregarStrava(nipAtual);
+});
+
+// ---------- admin: zerar progresso de todos, exceto o do próprio admin (toque duplo p/ confirmar) ----------
+const zerarPerfisBtn = document.getElementById('zerarPerfisBtn');
+const zerarPerfisMsg = document.getElementById('zerarPerfisMsg');
+let zerarArmado = false;
+zerarPerfisBtn.addEventListener('click', async () => {
+  if (!nipAtual) return;
+  if (!zerarArmado) {
+    zerarArmado = true;
+    zerarPerfisBtn.textContent = 'Toque de novo para CONFIRMAR';
+    setTimeout(() => { zerarArmado = false; zerarPerfisBtn.textContent = 'Zerar progresso dos demais militares'; }, 4000);
+    return;
+  }
+  zerarArmado = false;
+  zerarPerfisBtn.disabled = true;
+  zerarPerfisMsg.textContent = 'Zerando…';
+  const rec = await fetchBin();
+  if (!rec.ok) { zerarPerfisMsg.textContent = 'Falha ao ler o banco. Nada foi alterado.'; zerarPerfisBtn.disabled = false; return; }
+  const n = Object.keys(rec.progresso).filter(k => k !== nipAtual).length;
+  const mantido = rec.progresso[nipAtual] ? {[nipAtual]: rec.progresso[nipAtual]} : {};
+  await putBin({acessos: rec.acessos, progresso: mantido});
+  zerarPerfisMsg.textContent = n + ' perfil(is) zerado(s). O seu foi mantido.';
+  zerarPerfisBtn.textContent = 'Zerar progresso dos demais militares';
+  zerarPerfisBtn.disabled = false;
+  carregarLogAdmin();
 });
 
 // ---------- admin: log de acessos + progresso (reconhecido automaticamente pelo NIP) ----------
