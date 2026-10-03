@@ -893,8 +893,8 @@ function mostrarBoasVindas(militar){
   }
   bv.classList.remove('fade-out');
   bv.style.display = 'flex';
-  setTimeout(() => { bv.classList.add('fade-out'); }, 1500);
-  setTimeout(() => { bv.style.display = 'none'; }, 2100);
+  setTimeout(() => { bv.classList.add('fade-out'); }, 1900);  // 1,9 s visível + 0,6 s de fade = 2,5 s
+  setTimeout(() => { bv.style.display = 'none'; }, 2500);
 }
 
 async function tentarEntrar(){
