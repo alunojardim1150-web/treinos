@@ -773,6 +773,7 @@
     <div id="adminLogWrap"></div>
     <button id="exportarCsvBtn" class="btn-secundario" type="button" style="display:none;">⬇ Exportar CSV</button>
     <button id="zerarPerfisBtn" class="btn-secundario" type="button">Zerar progresso dos demais militares</button>
+    <button id="zerarMeuBtn" class="btn-secundario" type="button">Zerar o MEU progresso (recomeçar do zero)</button>
     <div class="admin-resumo" id="zerarPerfisMsg"></div>
   </div>
 </section>
@@ -1214,6 +1215,34 @@ zerarPerfisBtn.addEventListener('click', async () => {
   zerarPerfisBtn.textContent = 'Zerar progresso dos demais militares';
   zerarPerfisBtn.disabled = false;
   carregarLogAdmin();
+});
+
+// ---------- admin: zerar o proprio progresso (recomeca como primeiro acesso; toque duplo) ----------
+const zerarMeuBtn = document.getElementById('zerarMeuBtn');
+let zerarMeuArmado = false;
+zerarMeuBtn.addEventListener('click', async () => {
+  if (!nipAtual) return;
+  if (!zerarMeuArmado) {
+    zerarMeuArmado = true;
+    zerarMeuBtn.textContent = 'Toque de novo para CONFIRMAR';
+    setTimeout(() => { zerarMeuArmado = false; zerarMeuBtn.textContent = 'Zerar o MEU progresso (recomeçar do zero)'; }, 4000);
+    return;
+  }
+  zerarMeuArmado = false;
+  zerarMeuBtn.disabled = true;
+  clearTimeout(syncProgressoTimer);
+  zerarPerfisMsg.textContent = 'Zerando o seu progresso…';
+  const rec = await fetchBin();
+  if (!rec.ok) { zerarPerfisMsg.textContent = 'Falha ao ler o banco. Nada foi alterado.'; zerarMeuBtn.disabled = false; return; }
+  delete rec.progresso[nipAtual];
+  await putBin({acessos: rec.acessos, progresso: rec.progresso});
+  resetEstadoLocal();
+  aplicarEstadoNaTela();
+  zerarMeuBtn.textContent = 'Zerar o MEU progresso (recomeçar do zero)';
+  zerarMeuBtn.disabled = false;
+  zerarPerfisMsg.textContent = 'Seu progresso foi zerado. Volte à aba Treinos para começar.';
+  const abaTreinos = document.querySelector('[data-tab="treinos"]');
+  if (abaTreinos) abaTreinos.click();
 });
 
 // ---------- admin: log de acessos + progresso (reconhecido automaticamente pelo NIP) ----------
