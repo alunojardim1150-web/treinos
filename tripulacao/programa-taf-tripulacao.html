@@ -910,14 +910,13 @@ function mostrarBoasVindas(militar){
   document.getElementById('bvNome').textContent = militar.nome;
   // vocativo: cargo de destaque (coluna vocativo do militares.csv) ou, na falta, o nome de guerra
   const bvSub = document.getElementById('bvSub');
-  bvSub.textContent = 'Bem-vindo a bordo, ';
+  // nome de guerra já aparece em destaque acima; vocativo só para os cargos de destaque
+  bvSub.textContent = militar.vocativo ? 'Bem-vindo a bordo, ' : 'Bem-vindo a bordo';
   if (militar.vocativo) {
     const voc = document.createElement('span');
     voc.className = 'bv-voc';  // função de destaque na cor do nome (khaki)
     voc.textContent = militar.vocativo;
     bvSub.appendChild(voc);
-  } else {
-    bvSub.appendChild(document.createTextNode(militar.nome));
   }
   bv.classList.remove('fade-out');
   bv.style.display = 'flex';
