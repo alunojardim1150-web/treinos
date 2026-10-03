@@ -879,8 +879,8 @@ function mostrarBoasVindas(militar){
   const bv = document.getElementById('boasVindas');
   document.getElementById('bvGrad').textContent = militar.postoGrad;
   document.getElementById('bvNome').textContent = militar.nome;
-  // cargos de destaque (coluna vocativo do militares.csv): 'Bem-vindo a bordo, Comandante'
-  document.getElementById('bvSub').textContent = 'Bem-vindo a bordo' + (militar.vocativo ? ', ' + militar.vocativo : '');
+  // vocativo: cargo de destaque (coluna vocativo do militares.csv) ou, na falta, o nome de guerra
+  document.getElementById('bvSub').textContent = 'Bem-vindo a bordo, ' + (militar.vocativo || militar.nome);
   bv.classList.remove('fade-out');
   bv.style.display = 'flex';
   setTimeout(() => { bv.classList.add('fade-out'); }, 1500);
