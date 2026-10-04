@@ -646,6 +646,7 @@
 
 <!-- TREINOS -->
 <section class="panel active" id="treinos">
+ <div id="programaWrap" style="display:none;">
 
   <div class="semana-bar">
     <div class="semana-nav">
@@ -676,6 +677,7 @@
 
   <div id="weeksWrap"></div>
 
+ </div>
 </section>
 
 <!-- SOBRE -->
@@ -1400,6 +1402,8 @@ const nivelAtualLabel = document.getElementById('nivelAtualLabel');
 
 // estado de onboarding: 'teste' (calculo automatico, padrao) | 'manual' (escolha manual, fallback) | 'none' (ja tem nivel)
 function setOnboardState(state){
+  // treinos da semana só aparecem depois de escolher programa (com/sem natação) E nível
+  document.getElementById('programaWrap').style.display = (state === 'none' && modalidade && nivel) ? 'block' : 'none';
   document.getElementById('modalidadeOnboard').style.display = state === 'modalidade' ? 'block' : 'none';
   testeOnboard.style.display = state === 'teste' ? 'block' : 'none';
   nivelOnboard.style.display = state === 'manual' ? 'block' : 'none';
