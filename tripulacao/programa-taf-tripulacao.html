@@ -326,6 +326,7 @@
 
   /* ---- admin ---- */
   .admin-resumo{color:var(--muted-2);font-size:.74rem;margin-bottom:14px;}
+  .admin-nip-input{width:100%;box-sizing:border-box;background:var(--card);color:var(--ink-strong);border:1px solid var(--border-2);border-radius:0;padding:11px;font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;margin:14px 0 8px;}
   .admin-resumo b{color:var(--khaki);}
   .admin-log-table{width:100%;border-collapse:collapse;font-size:.72rem;}
   .admin-log-table th,.admin-log-table td{padding:8px 5px;border-bottom:1px solid var(--border);text-align:left;}
@@ -772,7 +773,8 @@
     <div class="admin-resumo" id="adminResumo"><span class="spinner"></span>Carregando…</div>
     <div id="adminLogWrap"></div>
     <button id="exportarCsvBtn" class="btn-secundario" type="button" style="display:none;">⬇ Exportar CSV</button>
-    <button id="zerarPerfisBtn" class="btn-secundario" type="button">Zerar progresso dos demais militares</button>
+    <input type="text" id="zerarNipInput" class="admin-nip-input" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="NIP do militar (em branco = todos)">
+    <button id="zerarPerfisBtn" class="btn-secundario" type="button">Zerar histórico de treinos</button>
     <button id="zerarMeuBtn" class="btn-secundario" type="button">Zerar o MEU progresso (recomeçar do zero)</button>
     <div class="admin-resumo" id="zerarPerfisMsg"></div>
   </div>
@@ -1203,28 +1205,52 @@ stravaDesconectarBtn.addEventListener('click', async () => {
   carregarStrava(nipAtual);
 });
 
-// ---------- admin: zerar progresso de todos, exceto o do próprio admin (toque duplo p/ confirmar) ----------
+// ---------- admin: zerar histórico de treinos (um NIP específico ou todos, exceto o admin; toque duplo) ----------
 const zerarPerfisBtn = document.getElementById('zerarPerfisBtn');
 const zerarPerfisMsg = document.getElementById('zerarPerfisMsg');
-let zerarArmado = false;
+const zerarNipInput = document.getElementById('zerarNipInput');
+const ZERAR_TXT = 'Zerar histórico de treinos';
+let zerarArmado = null;   // alvo armado: '*' (todos) ou o NIP
+let zerarTimer = null;
+function desarmarZerar(){ zerarArmado = null; zerarPerfisBtn.textContent = ZERAR_TXT; }
+zerarNipInput.addEventListener('input', desarmarZerar);
 zerarPerfisBtn.addEventListener('click', async () => {
   if (!nipAtual) return;
-  if (!zerarArmado) {
-    zerarArmado = true;
-    zerarPerfisBtn.textContent = 'Toque de novo para CONFIRMAR';
-    setTimeout(() => { zerarArmado = false; zerarPerfisBtn.textContent = 'Zerar progresso dos demais militares'; }, 4000);
+  const alvoNip = (zerarNipInput.value || '').replace(/\D/g, '');
+  const alvo = alvoNip || '*';
+  if (zerarArmado !== alvo) {
+    let rotulo = 'TODOS os militares (o seu é mantido)';
+    if (alvoNip) {
+      const m = MILITARES_HASH[await sha256Hex(alvoNip)];
+      if (!m) { zerarPerfisMsg.textContent = 'NIP não encontrado na lista da tripulação.'; desarmarZerar(); return; }
+      rotulo = m.postoGrad + ' ' + m.nome;
+    }
+    zerarArmado = alvo;
+    zerarPerfisBtn.textContent = 'Toque de novo para zerar: ' + rotulo;
+    clearTimeout(zerarTimer);
+    zerarTimer = setTimeout(desarmarZerar, 5000);
     return;
   }
-  zerarArmado = false;
+  clearTimeout(zerarTimer);
+  desarmarZerar();
   zerarPerfisBtn.disabled = true;
   zerarPerfisMsg.textContent = 'Zerando…';
   const rec = await fetchBin();
   if (!rec.ok) { zerarPerfisMsg.textContent = 'Falha ao ler o banco. Nada foi alterado.'; zerarPerfisBtn.disabled = false; return; }
-  const n = Object.keys(rec.progresso).filter(k => k !== nipAtual).length;
-  const mantido = rec.progresso[nipAtual] ? {[nipAtual]: rec.progresso[nipAtual]} : {};
-  await putBin({acessos: rec.acessos, progresso: mantido});
-  zerarPerfisMsg.textContent = n + ' perfil(is) zerado(s). O seu foi mantido.';
-  zerarPerfisBtn.textContent = 'Zerar progresso dos demais militares';
+  if (alvo === '*') {
+    const n = Object.keys(rec.progresso).filter(k => k !== nipAtual).length;
+    const mantido = rec.progresso[nipAtual] ? {[nipAtual]: rec.progresso[nipAtual]} : {};
+    await putBin({acessos: rec.acessos, progresso: mantido});
+    zerarPerfisMsg.textContent = n + ' perfil(is) zerado(s). O seu foi mantido.';
+  } else if (!rec.progresso[alvo]) {
+    zerarPerfisMsg.textContent = 'Este militar não tem histórico salvo. Nada foi alterado.';
+  } else {
+    delete rec.progresso[alvo];
+    await putBin({acessos: rec.acessos, progresso: rec.progresso});
+    if (alvo === nipAtual) { clearTimeout(syncProgressoTimer); resetEstadoLocal(); aplicarEstadoNaTela(); }
+    zerarPerfisMsg.textContent = 'Histórico do NIP ' + alvo + ' zerado. No próximo acesso ele começa do zero.';
+    zerarNipInput.value = '';
+  }
   zerarPerfisBtn.disabled = false;
   carregarLogAdmin();
 });
