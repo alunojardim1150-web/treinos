@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taf-f45-v2';
+const CACHE_NAME = 'taf-f45-v3';
 const SHELL = [
   './',
   './index.html',
@@ -31,6 +31,23 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // páginas (HTML): rede primeiro, para a tripulação sempre receber a versão nova;
+  // cache só se estiver sem internet
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((resp) => {
+          if (resp && resp.status === 200) {
+            const clone = resp.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return resp;
+        })
+        .catch(() => caches.match(event.request).then((c) => c || caches.match('./index.html')))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

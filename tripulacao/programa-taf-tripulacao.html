@@ -1729,6 +1729,13 @@ aplicarEstadoNaTela();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {});
+    let recarregou = false;
+    const tinhaControlador = !!navigator.serviceWorker.controller;  // 1º acesso: não recarrega
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (recarregou || !tinhaControlador) return;
+      recarregou = true;
+      window.location.reload();
+    });
   });
 }
 </script>
