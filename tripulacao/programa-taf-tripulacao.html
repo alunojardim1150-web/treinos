@@ -326,10 +326,12 @@
 
   /* ---- admin ---- */
   .admin-resumo{color:var(--muted-2);font-size:.74rem;margin-bottom:14px;}
-  .admin-nip-input{width:100%;box-sizing:border-box;background:var(--card);color:var(--ink-strong);border:1px solid var(--border-2);border-radius:0;padding:11px;font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;margin:14px 0 8px;}
+  
   .admin-resumo b{color:var(--khaki);}
   .admin-log-table{width:100%;border-collapse:collapse;font-size:.72rem;}
   .admin-log-table th,.admin-log-table td{padding:8px 5px;border-bottom:1px solid var(--border);text-align:left;}
+  .zerar-linha{margin-left:8px;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:0;padding:2px 6px;font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;vertical-align:middle;}
+  .zerar-linha.armado{background:var(--danger);color:#fff;}
   .admin-log-table th{color:var(--muted);text-transform:uppercase;font-size:.58rem;letter-spacing:.12em;}
   .admin-subtitulo{
     font-family:var(--title);color:var(--khaki);font-size:.72rem;
@@ -773,8 +775,7 @@
     <div class="admin-resumo" id="adminResumo"><span class="spinner"></span>Carregando…</div>
     <div id="adminLogWrap"></div>
     <button id="exportarCsvBtn" class="btn-secundario" type="button" style="display:none;">⬇ Exportar CSV</button>
-    <input type="text" id="zerarNipInput" class="admin-nip-input" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="NIP do militar (em branco = todos)">
-    <button id="zerarPerfisBtn" class="btn-secundario" type="button">Zerar histórico de treinos</button>
+    <button id="zerarPerfisBtn" class="btn-secundario" type="button">Zerar histórico de TODOS os militares</button>
     <button id="zerarMeuBtn" class="btn-secundario" type="button">Zerar o MEU progresso (recomeçar do zero)</button>
     <div class="admin-resumo" id="zerarPerfisMsg"></div>
   </div>
@@ -1208,15 +1209,13 @@ stravaDesconectarBtn.addEventListener('click', async () => {
 // ---------- admin: zerar histórico de treinos (um NIP específico ou todos, exceto o admin; toque duplo) ----------
 const zerarPerfisBtn = document.getElementById('zerarPerfisBtn');
 const zerarPerfisMsg = document.getElementById('zerarPerfisMsg');
-const zerarNipInput = document.getElementById('zerarNipInput');
-const ZERAR_TXT = 'Zerar histórico de treinos';
+const ZERAR_TXT = 'Zerar histórico de TODOS os militares';
 let zerarArmado = null;   // alvo armado: '*' (todos) ou o NIP
 let zerarTimer = null;
 function desarmarZerar(){ zerarArmado = null; zerarPerfisBtn.textContent = ZERAR_TXT; }
-zerarNipInput.addEventListener('input', desarmarZerar);
 zerarPerfisBtn.addEventListener('click', async () => {
   if (!nipAtual) return;
-  const alvoNip = (zerarNipInput.value || '').replace(/\D/g, '');
+  const alvoNip = '';
   const alvo = alvoNip || '*';
   if (zerarArmado !== alvo) {
     let rotulo = 'TODOS os militares (o seu é mantido)';
@@ -1249,9 +1248,32 @@ zerarPerfisBtn.addEventListener('click', async () => {
     await putBin({acessos: rec.acessos, progresso: rec.progresso});
     if (alvo === nipAtual) { clearTimeout(syncProgressoTimer); resetEstadoLocal(); aplicarEstadoNaTela(); }
     zerarPerfisMsg.textContent = 'Histórico do NIP ' + alvo + ' zerado. No próximo acesso ele começa do zero.';
-    zerarNipInput.value = '';
   }
   zerarPerfisBtn.disabled = false;
+  carregarLogAdmin();
+});
+
+// ---------- admin: zerar o histórico de UM militar (botão ao lado do NIP nas tabelas; toque duplo) ----------
+function btnZerarLinha(nip){ return ` <button type="button" class="zerar-linha" data-nip="${nip}">zerar</button>`; }
+document.getElementById('adminLogWrap').addEventListener('click', async (e) => {
+  const b = e.target.closest('.zerar-linha');
+  if (!b || !nipAtual) return;
+  const nip = b.dataset.nip;
+  if (!b.classList.contains('armado')) {
+    document.querySelectorAll('.zerar-linha.armado').forEach(x => { x.classList.remove('armado'); x.textContent = 'zerar'; });
+    b.classList.add('armado'); b.textContent = 'confirmar?';
+    setTimeout(() => { b.classList.remove('armado'); b.textContent = 'zerar'; }, 4000);
+    return;
+  }
+  b.disabled = true; b.textContent = '…';
+  const rec = await fetchBin();
+  if (!rec.ok) { zerarPerfisMsg.textContent = 'Falha ao ler o banco. Nada foi alterado.'; b.disabled = false; b.textContent = 'zerar'; return; }
+  if (rec.progresso[nip]) {
+    delete rec.progresso[nip];
+    await putBin({acessos: rec.acessos, progresso: rec.progresso});
+  }
+  if (nip === nipAtual) { clearTimeout(syncProgressoTimer); resetEstadoLocal(); aplicarEstadoNaTela(); }
+  zerarPerfisMsg.textContent = 'Histórico do NIP ' + nip + ' zerado. No próximo acesso ele começa do zero.';
   carregarLogAdmin();
 });
 
@@ -1308,12 +1330,12 @@ async function carregarLogAdmin(){
     const linhasProgresso = Object.keys(progresso).map(nip => {
       const p = progresso[nip];
       const atualizado = p.atualizadoEm ? new Date(p.atualizadoEm).toLocaleString('pt-BR') : '-';
-      return `<tr><td>${nip}</td><td>${MODALIDADE_NOME[p.modalidade] || '-'}</td><td>${badgeNivel(p.nivel)}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td><span class="progresso">${barraProgresso(pctProgresso(p))}</span></td><td>${atualizado}</td></tr>`;
+      return `<tr><td>${nip}${btnZerarLinha(nip)}</td><td>${MODALIDADE_NOME[p.modalidade] || '-'}</td><td>${badgeNivel(p.nivel)}</td><td>${p.semanaLiberada || 1}/${TOTAL_SEMANAS}</td><td><span class="progresso">${barraProgresso(pctProgresso(p))}</span></td><td>${atualizado}</td></tr>`;
     }).join('');
 
     const linhasAcesso = acessos.slice().reverse().map(a => {
       const data = new Date(a.ts);
-      return `<tr><td>${a.nip}</td><td>${data.toLocaleString('pt-BR')}</td></tr>`;
+      return `<tr><td>${a.nip}${progresso[a.nip] ? btnZerarLinha(a.nip) : ''}</td><td>${data.toLocaleString('pt-BR')}</td></tr>`;
     }).join('');
 
     wrap.innerHTML =
