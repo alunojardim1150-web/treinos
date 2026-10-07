@@ -1385,21 +1385,31 @@ document.getElementById('exportarCsvBtn').addEventListener('click', () => {
 
 // ---------- frase motivacional do dia ----------
 const FRASES = [
-  {texto:"Venham buscá-las.", autor:"Leônidas I, em Termópilas (segundo Plutarco)"},
-  {texto:"Ou com o escudo, ou sobre ele.", autor:"Ditado espartano (segundo Plutarco, Moralia)"},
+  {texto:"Não importa o quão forte você bate. Importa o quanto você aguenta apanhar e continuar seguindo em frente.", autor:"Rocky Balboa (filme, 2006)"},
+  {texto:"Por que caímos? Para aprendermos a nos levantar.", autor:"Batman Begins (filme, 2005)"},
+  {texto:"O que fazemos em vida ecoa na eternidade.", autor:"Gladiador (filme, 2000)"},
+  {texto:"Faça ou não faça. Tentativa não há.", autor:"Mestre Yoda, Star Wars: O Império Contra-Ataca (1980)"},
+  {texto:"Não é o avião, é o piloto.", autor:"Top Gun: Maverick (filme, 2022)"},
+  {texto:"Eu sou o mestre do meu destino, o capitão da minha alma.", autor:"William Ernest Henley, poema Invictus"},
+  {texto:"Sustentar o fogo, que a vitória é nossa.", autor:"Almirante Barroso, Batalha Naval do Riachuelo (1865)"},
+  {texto:"Mar calmo nunca fez bom marinheiro.", autor:"Provérbio marinheiro"},
+  {texto:"Um navio no porto está seguro, mas não é para isso que os navios são feitos.", autor:"John A. Shedd, Salt from My Attic (1928)"},
+  {texto:"Duro no treino, fácil no combate.", autor:"Marechal Alexander Suvorov"},
   {texto:"O único dia fácil foi ontem.", autor:"Lema dos Navy SEALs (EUA)"},
-  {texto:"Nunca desista. Nunca, nunca, nunca.", autor:"Winston Churchill, discurso em Harrow School, 1941"},
-  {texto:"Se queres a paz, prepara-te para a guerra.", autor:"Flávio Vegécio, De Re Militari"},
-  {texto:"A vitória pertence aos mais perseverantes.", autor:"Napoleão Bonaparte"},
-  {texto:"Conheça o inimigo e conheça a si mesmo: em cem batalhas, você nunca estará em perigo.", autor:"Sun Tzu, A Arte da Guerra"},
-  {texto:"A oportunidade de vencer é dada pelo próprio inimigo.", autor:"Sun Tzu, A Arte da Guerra"},
+  {texto:"Venham buscá-las.", autor:"Leônidas I, em Termópilas (segundo Plutarco)"},
+  {texto:"Ou com o escudo, ou sobre ele.", autor:"Ditado espartano (segundo Plutarco)"},
+  {texto:"Odiei cada minuto do treino, mas dizia a mim mesmo: não desista. Sofra agora e viva o resto da vida como um campeão.", autor:"Muhammad Ali (atribuída)"},
+  {texto:"Vencer não é tudo, mas querer vencer é.", autor:"Vince Lombardi"},
+  {texto:"Disciplina é a ponte entre metas e realizações.", autor:"Jim Rohn"},
+  {texto:"Somos o que fazemos repetidamente. A excelência, portanto, não é um ato, mas um hábito.", autor:"Will Durant, sobre Aristóteles"},
   {texto:"O que fica no caminho torna-se o caminho.", autor:"Marco Aurélio, Meditações"},
-  {texto:"Pare de discutir o que é ser um homem bom. Seja um.", autor:"Marco Aurélio, Meditações"},
-  {texto:"A melhor vingança é não ser como seu inimigo.", autor:"Marco Aurélio, Meditações"},
-  {texto:"Ninguém é livre se não for senhor de si mesmo.", autor:"Epicteto, Enchiridion"},
-  {texto:"Sofremos mais na imaginação do que na realidade.", autor:"Sêneca, Cartas a Lucílio"},
   {texto:"Não há vento favorável para quem não sabe a que porto se dirige.", autor:"Sêneca, Cartas a Lucílio"},
+  {texto:"Nunca desista. Nunca, nunca, nunca.", autor:"Winston Churchill, Harrow School, 1941"},
 ];
+// frases fixas para datas especiais (AAAA-MM-DD, horário local)
+const FRASES_DATAS = {
+  '2026-10-07': {texto:"O que fica no caminho torna-se o caminho.", autor:"Marco Aurélio, Meditações · Dia 1 do Programa TAF - F45"},
+};
 
 function diaDoAno(){
   const agora = new Date();
@@ -1411,7 +1421,9 @@ function diaDoAno(){
 function renderFraseDia(){
   const el = document.getElementById('fraseDia');
   if (!el || !FRASES.length) return;
-  const f = FRASES[diaDoAno() % FRASES.length];
+  const hoje = new Date();
+  const chave = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
+  const f = FRASES_DATAS[chave] || FRASES[diaDoAno() % FRASES.length];
   el.innerHTML = `<blockquote>${f.texto}</blockquote><cite>${f.autor}</cite>`;
 }
 renderFraseDia();
